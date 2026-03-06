@@ -2,7 +2,7 @@
 // ส่วนตั้งค่าระบบฐานข้อมูล (Google Sheets)
 // ==========================================
 // ลิงก์ Web App URL ของคุณ (ใส่ให้เรียบร้อยแล้วครับ!)
-const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzqJb0rqqaMR7lXSfTIl6PXQsuBU5aX-fpWH8rbE8bDrSOSCwPi8T5RqIg5cvrH3USfAA/exec"; 
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbykgE_h5tzClR7Nt_0PPalCzqaSGjVhPyJtR1HXScPz2HA72RNct9AdyzX6jUPVdTEKlw/exec"; 
 
 // ==========================================
 // 1. โหลดระบบพื้นฐานเมื่อเปิดเว็บ
@@ -308,3 +308,4 @@ function renderStatsCharts() {
         }
     });
 }
+
