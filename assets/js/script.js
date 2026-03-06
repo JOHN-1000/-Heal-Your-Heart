@@ -1,3 +1,12 @@
+// ==========================================
+// ส่วนตั้งค่าระบบฐานข้อมูล (Google Sheets)
+// ==========================================
+// ลิงก์ Web App URL ของคุณ (ใส่ให้เรียบร้อยแล้วครับ!)
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzqJb0rqqaMR7lXSfTIl6PXQsuBU5aX-fpWH8rbE8bDrSOSCwPi8T5RqIg5cvrH3USfAA/exec"; 
+
+// ==========================================
+// 1. โหลดระบบพื้นฐานเมื่อเปิดเว็บ
+// ==========================================
 window.onload = function() {
     checkUser();
     showDailyQuote();
@@ -37,6 +46,9 @@ function toggleMobileMenu() {
     document.querySelector('.nav-links').classList.toggle('active');
 }
 
+// ==========================================
+// 2. เรนเดอร์คำถามแบบประเมิน (9Q และ ST-5)
+// ==========================================
 function renderQuestions() {
     const container9Q = document.getElementById('questions-9q');
     const containerST5 = document.getElementById('questions-st5');
@@ -64,6 +76,9 @@ function createRadioHtml(name, question, values, labels) {
     return html;
 }
 
+// ==========================================
+// 3. ควบคุมการเปลี่ยนหน้าแบบประเมิน
+// ==========================================
 function goToStep2() {
     const consent = document.getElementById('pdpa-consent').checked;
     if (!consent) {
@@ -80,6 +95,7 @@ function goToStep2() {
     const q2_1 = document.querySelector('input[name="q2_1"]:checked')?.value;
     const q2_2 = document.querySelector('input[name="q2_2"]:checked')?.value;
     
+    // ถ้าข้อ 2Q ตอบไม่มีทั้งคู่ ถือว่าปกติ ส่งผลทันที
     if (q2_1 === 'no' && q2_2 === 'no') {
         saveData(0, 0, age, gender, job);
         return;
@@ -131,20 +147,45 @@ function submitAll() {
     saveData(score9Q, scoreST5, age, gender, job);
 }
 
+// ==========================================
+// 4. บันทึกผลและส่งข้อมูลไป Google Sheets
+// ==========================================
 function saveData(s9, s5, age, gender, job) {
+    // เปลี่ยนเป้าเมาส์เป็นรูปกำลังโหลด
+    document.body.style.cursor = "wait";
+    
     const now = new Date();
     const dateStr = `${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()} เวลา ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')} น.`;
 
-    const newData = { score9Q: s9, scoreST5: s5, age, gender, job, date: dateStr };
+    const newData = { score9Q: s9, scoreST5: s5, age: age, gender: gender, job: job, date: dateStr };
     
+    // ก. เก็บบันทึกประวัติลงในเครื่องผู้ใช้ (LocalStorage)
     let history = JSON.parse(localStorage.getItem('healHeartHistory')) || [];
     history.push(newData);
     localStorage.setItem('healHeartHistory', JSON.stringify(history));
-
     localStorage.setItem('healHeartResult', JSON.stringify(newData));
-    window.location.href = 'result.html';
+
+    // ข. ส่งข้อมูลเข้าฐานข้อมูล Google Sheets
+    fetch(GOOGLE_SHEET_URL, {
+        method: 'POST',
+        body: JSON.stringify(newData)
+    })
+    .then(response => response.json())
+    .then(result => {
+        document.body.style.cursor = "default"; 
+        window.location.href = 'result.html'; // ส่งเสร็จแล้วเด้งไปหน้าผลลัพธ์
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.body.style.cursor = "default";
+        // ถ้าเน็ตหลุด ก็ยังให้ไปหน้าผลลัพธ์ได้ตามปกติ
+        window.location.href = 'result.html'; 
+    });
 }
 
+// ==========================================
+// 5. แสดงผลลัพธ์และประวัติ
+// ==========================================
 function loadResult() {
     const data = JSON.parse(localStorage.getItem('healHeartResult'));
     const container = document.getElementById('result-content');
@@ -224,6 +265,9 @@ function clearHistory() {
     }
 }
 
+// ==========================================
+// 6. สร้างกราฟสถิติหน้าภาพรวม
+// ==========================================
 function renderStatsCharts() {
     new Chart(document.getElementById('dailyChart'), {
         type: 'line',
