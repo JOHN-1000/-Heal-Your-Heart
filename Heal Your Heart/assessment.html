@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบประเมิน - Heal Your Heart</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;500;700&family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">💖 Heal Your Heart</div>
+        <ul class="nav-links">
+            <li><a href="index.html">หน้าหลัก</a></li>
+            <li><a href="assessment.html" class="active">เช็คสุขภาพใจ</a></li>
+            <li><a href="result.html">ผลลัพธ์</a></li>
+            <li><a href="food.html">ฮีลด้วยกิน</a></li>
+            <li><a href="contact.html">ปรึกษาแพทย์ผู้เชี่ยวชาญ</a></li>
+            <li><a href="stats.html" style="color: #6c5ce7; font-weight: bold;">📊 สถิติการใช้งาน</a></li>
+        </ul>
+        <div class="hamburger" onclick="toggleMobileMenu()">☰</div>
+    </nav>
+
+    <div class="container fade-in">
+        
+        <div id="step-1">
+            <div class="card">
+                <h2>📝 1. ข้อมูลทั่วไป</h2>
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label class="form-label">เพศ</label>
+                        <select id="gender" class="form-control">
+                            <option value="ชาย">ชาย</option>
+                            <option value="หญิง">หญิง</option>
+                            <option value="LGBTQ">LGBTQ+</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">อายุ</label>
+                        <input type="number" id="age" class="form-control" placeholder="ระบุอายุ (ปี)">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">อาชีพ</label>
+                        <select id="job" class="form-control">
+                            <option value="student">นักเรียน/นักศึกษา</option>
+                            <option value="gov">ข้าราชการ/รัฐวิสาหกิจ</option>
+                            <option value="company">พนักงานบริษัทเอกชน</option>
+                            <option value="business">เจ้าของธุรกิจ/ค้าขาย</option>
+                            <option value="freelance">รับจ้างทั่วไป/ฟรีแลนซ์</option>
+                            <option value="other">อื่นๆ</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🔍 2. คัดกรองเบื้องต้น (2Q)</h2>
+                <div class="form-group">
+                    <label class="form-label">1. ใน 2 สัปดาห์ที่ผ่านมา ท่านรู้สึกหดหู่ เศร้า หรือท้อแท้สิ้นหวังหรือไม่?</label>
+                    <div class="radio-tile-group">
+                        <label class="radio-tile-label"><input type="radio" name="q2_1" value="yes"><div class="radio-tile">มี</div></label>
+                        <label class="radio-tile-label"><input type="radio" name="q2_1" value="no" checked><div class="radio-tile">ไม่มี</div></label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">2. ใน 2 สัปดาห์ที่ผ่านมา ท่านรู้สึกเบื่อ ทำอะไรก็ไม่เพลิดเพลินหรือไม่?</label>
+                    <div class="radio-tile-group">
+                        <label class="radio-tile-label"><input type="radio" name="q2_2" value="yes"><div class="radio-tile">มี</div></label>
+                        <label class="radio-tile-label"><input type="radio" name="q2_2" value="no" checked><div class="radio-tile">ไม่มี</div></label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group" style="background: #fff5f7; padding: 15px; border-radius: 10px; border: 1px dashed #ff758c; margin-top: 20px;">
+                <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" id="pdpa-consent" style="margin-top: 5px; transform: scale(1.2);">
+                    <span style="font-size: 0.9rem; color: #636e72;">
+                        <b>คำยินยอม (Consent):</b> ข้าพเจ้ายินยอมให้ระบบประมวลผลข้อมูลพื้นฐานและผลประเมินเพื่อใช้ในการแสดงผลและสรุปสถิติภาพรวม โดยระบบจะไม่เก็บข้อมูลที่สามารถระบุตัวตนได้
+                    </span>
+                </label>
+            </div>
+            
+            <div class="text-center" style="margin-top: 20px;">
+                <button class="btn-main" onclick="goToStep2()">ดำเนินการต่อ ➡️</button>
+            </div>
+        </div>
+
+        <div id="step-2" class="hidden fade-in">
+            <div class="card">
+                <h2>📉 3. แบบประเมินซึมเศร้า (9Q)</h2>
+                <p style="color: #636e72; margin-bottom: 20px;">ในช่วง 2 สัปดาห์ที่ผ่านมา ท่านมีอาการเหล่านี้บ่อยแค่ไหน?</p>
+                <div id="questions-9q"></div>
+            </div>
+            <div class="text-center">
+                <button class="btn-main" onclick="goToStep3()">ถัดไป (ประเมินความเครียด) ➡️</button>
+            </div>
+        </div>
+
+        <div id="step-3" class="hidden fade-in">
+            <div class="card">
+                <h2 style="color:#e17055;">🤯 4. แบบประเมินความเครียด (ST-5)</h2>
+                <p style="color: #636e72; margin-bottom: 20px;">ในช่วง 2-4 สัปดาห์ที่ผ่านมา ท่านมีอาการเหล่านี้บ่อยแค่ไหน?</p>
+                <div id="questions-st5"></div>
+            </div>
+            <div class="text-center">
+                <button class="btn-main" onclick="submitAll()">✅ ดูผลลัพธ์</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/script.js"></script>
+</body>
+</html>

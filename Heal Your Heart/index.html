@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หน้าหลัก - Heal Your Heart</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;500;700&family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">💖 Heal Your Heart</div>
+        <ul class="nav-links">
+            <li><a href="index.html" class="active">หน้าหลัก</a></li>
+            <li><a href="assessment.html">เช็คสุขภาพใจ</a></li>
+            <li><a href="result.html">ผลลัพธ์</a></li>
+            <li><a href="food.html">ฮีลด้วยกิน</a></li>
+            <li><a href="contact.html">ปรึกษาแพทย์ผู้เชี่ยวชาญ</a></li>
+            <li><a href="stats.html" style="color: #6c5ce7; font-weight: bold;">📊 สถิติการใช้งาน</a></li>
+        </ul>
+        <div class="hamburger" onclick="toggleMobileMenu()">☰</div>
+    </nav>
+
+    <div class="container fade-in">
+        <div class="card text-center">
+            <h1 id="user-display">ยินดีต้อนรับ 👋</h1>
+            <h2>เหนื่อยไหม? ให้เราช่วย <span style="color:#ff758c">"ฮีลใจ"</span> 💖</h2>
+            <p style="margin-bottom:20px;">ตรวจเช็คสุขภาพจิตง่ายๆ ด้วยมาตรฐานกรมสุขภาพจิต (2Q, 9Q และ ST-5)</p>
+            <a href="assessment.html" class="btn-main">🚀 เริ่มทำแบบประเมิน (2 นาที)</a>
+        </div>
+
+        <div class="card text-center" style="background: linear-gradient(135deg, #fff0f3, #ffeaa7); border: none; box-shadow: none;">
+            <h3 style="color: #ff758c; font-size: 1.2rem;">✨ ข้อความฮีลใจประจำวันนี้ ✨</h3>
+            <p id="daily-quote" style="font-size: 1.5rem; font-weight: 500; color: #2d3436; margin: 15px 0;">
+                "กำลังโหลดข้อความดีๆ..."
+            </p>
+        </div>
+
+        <div class="grid-3">
+            <div class="card text-center">
+                <div style="font-size:3rem;">📝</div>
+                <h3>เช็คง่าย รู้ผลไว</h3>
+                <p>รู้ผลทันที ไม่ต้องรอนาน</p>
+            </div>
+            <div class="card text-center">
+                <div style="font-size:3rem;">🥗</div>
+                <h3>โภชนาการบำบัด</h3>
+                <p>อาหารช่วยปรับสมดุลอารมณ์</p>
+            </div>
+            <div class="card text-center">
+                <div style="font-size:3rem;">👩‍⚕️</div>
+                <h3>ปรึกษาผู้เชี่ยวชาญ</h3>
+                <p>ช่องทางติดต่อหมอโดยตรง</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/script.js"></script>
+</body>
+</html>
