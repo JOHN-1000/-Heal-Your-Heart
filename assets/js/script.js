@@ -1,31 +1,6 @@
 // ==========================================
-// 🚨 ข้อมูลแบบประเมิน (ASSESSMENT_DATA) 
-// ==========================================
-const ASSESSMENT_DATA = {
-    q9: [
-        "เบื่อ ไม่สนใจอยากทำอะไร",
-        "ไม่สบายใจ ซึมเศร้า หรือท้อแท้",
-        "หลับยาก หรือหลับๆ ตื่นๆ หรือหลับมากเกินไป",
-        "เหนื่อยง่าย หรือไม่ค่อยมีแรง",
-        "เบื่ออาหาร หรือกินมากเกินไป",
-        "รู้สึกไม่ดีกับตัวเอง คิดว่าตัวเองล้มเหลว หรือทำให้ตนเองหรือครอบครัวผิดหวัง",
-        "สมาธิไม่ดีเวลาทำอะไร เช่น ดูโทรทัศน์ ฟังวิทยุ หรือทำงานที่ต้องใช้ความตั้งใจ",
-        "พูดหรือทำอะไรช้าจนคนอื่นสังเกตเห็นได้ หรือกระสับกระส่ายจนไม่อาจอยู่นิ่งได้เหมือนเคย",
-        "คิดทำร้ายตนเอง หรือคิดว่าถ้าตายไปคงจะดี"
-    ],
-    st5: [
-        "มีปัญหาการนอน นอนไม่หลับหรือนอนมากเกินไป",
-        "สมาธิลดน้อยลง",
-        "หงุดหงิด กระสับกระส่าย วุ่นวายใจ",
-        "รู้สึกเบื่อ เซ็ง",
-        "ไม่อยากพบปะผู้คน"
-    ]
-};
-
-// ==========================================
 // ส่วนตั้งค่าระบบฐานข้อมูล (Google Sheets)
 // ==========================================
-// ลิงก์ Web App URL จากเวอร์ชันล่าสุดของคุณ
 const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyzqJb0rqqaMR7lXSfTIl6PXQsuBU5aX-fpWH8rbE8bDrSOSCwPi8T5Rqlg5cvrH3USfAA/exec"; 
 
 // ==========================================
@@ -36,9 +11,8 @@ window.onload = function() {
     showDailyQuote();
     
     // ตรวจสอบหน้าเพื่อเรียกฟังก์ชันให้ตรงกับ Element ที่มี
-    if (document.getElementById('questions-9q')) renderQuestions();
+    if (document.getElementById('questions-2q') || document.getElementById('questions-9q')) renderQuestions();
     if (document.getElementById('result-content')) loadResult();
-    // ถ้าพบกราฟ dailyChart แสดงว่าอยู่หน้า stats.html ให้ดึงข้อมูลจริงมาโชว์
     if (document.getElementById('dailyChart')) renderRealStats(); 
 };
 
@@ -70,22 +44,43 @@ function toggleMobileMenu() {
 }
 
 // ==========================================
-// 2. ระบบเรนเดอร์คำถาม (สร้างจาก ASSESSMENT_DATA)
+// 2. ระบบเรนเดอร์คำถาม (สร้างจาก ASSESSMENT_DATA ใน data.js)
 // ==========================================
 function renderQuestions() {
+    const container2Q = document.getElementById('questions-2q');
     const container9Q = document.getElementById('questions-9q');
     const containerST5 = document.getElementById('questions-st5');
-    if(!container9Q || !containerST5) return;
 
-    container9Q.innerHTML = "";
-    containerST5.innerHTML = "";
+    // เรนเดอร์คำถาม 2Q (เพิ่มส่วนนี้เพื่อให้เห็นคำถาม q2)
+    if (container2Q) {
+        container2Q.innerHTML = "";
+        ASSESSMENT_DATA.q2.forEach((q) => {
+            container2Q.innerHTML += `
+                <div class="form-group" style="border-bottom:1px solid #f0f0f0; padding-bottom:15px;">
+                    <label class="form-label">${q.text}</label>
+                    <div class="radio-tile-group">
+                        <label class="radio-tile-label"><input type="radio" name="${q.id}" value="yes"> <div class="radio-tile">มี</div></label>
+                        <label class="radio-tile-label"><input type="radio" name="${q.id}" value="no"> <div class="radio-tile">ไม่มี</div></label>
+                    </div>
+                </div>`;
+        });
+    }
 
-    ASSESSMENT_DATA.q9.forEach((q, i) => {
-        container9Q.innerHTML += createRadioHtml(`q9_${i}`, q, [0, 1, 2, 3], ["ไม่เลย", "บางวัน", "บ่อย", "ทุกวัน"]);
-    });
-    ASSESSMENT_DATA.st5.forEach((q, i) => {
-        containerST5.innerHTML += createRadioHtml(`st5_${i}`, q, [0, 1, 2, 3], ["แทบไม่มี", "เป็นบางครั้ง", "บ่อยครั้ง", "ประจำ"]);
-    });
+    // เรนเดอร์ 9Q
+    if (container9Q) {
+        container9Q.innerHTML = "";
+        ASSESSMENT_DATA.q9.forEach((q, i) => {
+            container9Q.innerHTML += createRadioHtml(`q9_${i}`, q, [0, 1, 2, 3], ["ไม่เลย", "บางวัน", "บ่อย", "ทุกวัน"]);
+        });
+    }
+
+    // เรนเดอร์ ST-5
+    if (containerST5) {
+        containerST5.innerHTML = "";
+        ASSESSMENT_DATA.st5.forEach((q, i) => {
+            containerST5.innerHTML += createRadioHtml(`st5_${i}`, q, [0, 1, 2, 3], ["แทบไม่มี", "บางครั้ง", "บ่อยครั้ง", "ประจำ"]);
+        });
+    }
 }
 
 function createRadioHtml(name, question, values, labels) {
@@ -103,16 +98,24 @@ function createRadioHtml(name, question, values, labels) {
 }
 
 // ==========================================
-// 3. บันทึกผลและส่งข้อมูลไป Google Sheets
+// 3. ระบบบันทึกข้อมูลและส่งค่า (POST)
 // ==========================================
 function submitAll() {
     let score9Q = 0, scoreST5 = 0;
     let allAnswered = true;
 
+    // ตรวจสอบการตอบ 2Q
+    const q2_1 = document.querySelector('input[name="q2_1"]:checked');
+    const q2_2 = document.querySelector('input[name="q2_2"]:checked');
+    if (!q2_1 || !q2_2) allAnswered = false;
+
+    // คำนวณคะแนน 9Q
     for (let i = 0; i < 9; i++) {
         const sel = document.querySelector(`input[name="q9_${i}"]:checked`);
         if (sel) score9Q += parseInt(sel.value); else allAnswered = false;
     }
+
+    // คำนวณคะแนน ST-5
     for (let i = 0; i < 5; i++) {
         const sel = document.querySelector(`input[name="st5_${i}"]:checked`);
         if (sel) scoreST5 += parseInt(sel.value); else allAnswered = false;
@@ -142,7 +145,6 @@ function saveData(s9, s5, age, gender, job) {
     
     localStorage.setItem('healHeartResult', JSON.stringify(newData));
 
-    // ส่งข้อมูลแบบ POST
     fetch(GOOGLE_SHEET_URL, {
         method: 'POST',
         body: JSON.stringify(newData)
@@ -158,7 +160,7 @@ function saveData(s9, s5, age, gender, job) {
 }
 
 // ==========================================
-// 4. ระบบดึงข้อมูลมาแสดงสถิติจริง (GET)
+// 4. ระบบดึงข้อมูลสถิติจริง (GET)
 // ==========================================
 async function renderRealStats() {
     try {
@@ -169,7 +171,6 @@ async function renderRealStats() {
         let visitDates = {};
 
         allData.forEach(row => {
-            // วันที่ [0], อาชีพ [3] ใน Sheets
             const dateStr = row[0].split(' ')[0]; 
             visitDates[dateStr] = (visitDates[dateStr] || 0) + 1;
             const job = row[3];
@@ -177,36 +178,23 @@ async function renderRealStats() {
             else jobCounts["ฟรีแลนซ์/อื่นๆ"]++;
         });
 
-        // อัปเดตยอดผู้ใช้งานรวมในหน้าเว็บ
         const totalUsers = allData.length;
         const totalElement = document.querySelector('.stats-card h1'); 
         if (totalElement) totalElement.innerText = totalUsers.toLocaleString();
 
-        // สร้างกราฟเส้น
         new Chart(document.getElementById('dailyChart'), {
             type: 'line',
             data: {
                 labels: Object.keys(visitDates),
-                datasets: [{ 
-                    label: 'จำนวนผู้ใช้งานจริง', 
-                    data: Object.values(visitDates), 
-                    borderColor: '#ff758c', 
-                    fill: true, 
-                    tension: 0.4,
-                    backgroundColor: 'rgba(255, 117, 140, 0.1)'
-                }]
+                datasets: [{ label: 'จำนวนผู้ใช้งานจริง', data: Object.values(visitDates), borderColor: '#ff758c', fill: true, tension: 0.4 }]
             }
         });
 
-        // สร้างกราฟวงกลม
         new Chart(document.getElementById('jobChart'), {
             type: 'doughnut',
             data: {
                 labels: Object.keys(jobCounts),
-                datasets: [{ 
-                    data: Object.values(jobCounts), 
-                    backgroundColor: ['#ff758c', '#a29bfe', '#74b9ff', '#ffeaa7', '#fab1a0'] 
-                }]
+                datasets: [{ data: Object.values(jobCounts), backgroundColor: ['#ff758c', '#a29bfe', '#74b9ff', '#ffeaa7', '#fab1a0'] }]
             }
         });
 
