@@ -1,6 +1,7 @@
-
-// เอาลิงก์ใหม่ของคุณมาวางในเครื่องหมายคำพูดครับ
-const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxXGDWBqvltT4R1qbC9_kh33wfcD6bztBvKlfuO0QsjAQM791nUJ4bh_zYbfc0_0nmaaQ/exec";
+// ==========================================
+// ส่วนตั้งค่าระบบฐานข้อมูล (Google Sheets)
+// ==========================================
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxXGDWBqvltT4R1qbC9_kh33wfcD6bztBvKlfuO0QsjAQM791nUJ4bh_zYbfc0_0nmaaQ/exec"; 
 
 // ==========================================
 // 1. โหลดระบบพื้นฐานเมื่อเปิดเว็บ
@@ -47,7 +48,7 @@ function toggleMobileMenu() {
 }
 
 // ==========================================
-// 2. เรนเดอร์คำถามแบบประเมิน (ดึงข้อมูลจากไฟล์ data.js)
+// 2. เรนเดอร์คำถามแบบประเมิน (ดึงจาก data.js)
 // ==========================================
 function renderQuestions() {
     const container2Q = document.getElementById('questions-2q');
@@ -55,22 +56,22 @@ function renderQuestions() {
     const containerST5 = document.getElementById('questions-st5');
 
     // เรนเดอร์ 2Q
-    if (container2Q) {
+    if (container2Q && typeof ASSESSMENT_DATA !== 'undefined' && ASSESSMENT_DATA.q2) {
         container2Q.innerHTML = "";
         ASSESSMENT_DATA.q2.forEach((q) => {
             container2Q.innerHTML += `
                 <div class="form-group" style="border-bottom:1px solid #f0f0f0; padding-bottom:15px;">
                     <label class="form-label">${q.text}</label>
                     <div class="radio-tile-group">
-                        <label class="radio-tile-label"><input type="radio" name="${q.id}" value="yes"> <div class="radio-tile">มี</div></label>
                         <label class="radio-tile-label"><input type="radio" name="${q.id}" value="no"> <div class="radio-tile">ไม่มี</div></label>
+                        <label class="radio-tile-label"><input type="radio" name="${q.id}" value="yes"> <div class="radio-tile">มี</div></label>
                     </div>
                 </div>`;
         });
     }
 
     // เรนเดอร์ 9Q
-    if (container9Q) {
+    if (container9Q && typeof ASSESSMENT_DATA !== 'undefined' && ASSESSMENT_DATA.q9) {
         container9Q.innerHTML = "";
         ASSESSMENT_DATA.q9.forEach((q, i) => {
             container9Q.innerHTML += createRadioHtml(`q9_${i}`, q, [0, 1, 2, 3], ["ไม่เลย", "บางวัน", "บ่อย", "ทุกวัน"]);
@@ -78,7 +79,7 @@ function renderQuestions() {
     }
 
     // เรนเดอร์ ST-5
-    if (containerST5) {
+    if (containerST5 && typeof ASSESSMENT_DATA !== 'undefined' && ASSESSMENT_DATA.st5) {
         containerST5.innerHTML = "";
         ASSESSMENT_DATA.st5.forEach((q, i) => {
             containerST5.innerHTML += createRadioHtml(`st5_${i}`, q, [0, 1, 2, 3], ["แทบไม่มี", "บางครั้ง", "บ่อยครั้ง", "ประจำ"]);
@@ -104,8 +105,8 @@ function createRadioHtml(name, question, values, labels) {
 // 3. ควบคุมการเปลี่ยนหน้าแบบประเมิน
 // ==========================================
 function goToStep2() {
-    const consent = document.getElementById('pdpa-consent')?.checked;
-    if (document.getElementById('pdpa-consent') && !consent) {
+    const pdpaCheckbox = document.getElementById('pdpa-consent');
+    if (pdpaCheckbox && !pdpaCheckbox.checked) {
         alert("⚠️ กรุณากดยอมรับเงื่อนไขการใช้งานก่อนดำเนินการต่อครับ");
         return;
     }
@@ -123,7 +124,7 @@ function goToStep2() {
     const q2_2 = document.querySelector('input[name="q2_2"]:checked')?.value;
 
     if (!q2_1 || !q2_2) {
-        alert("กรุณาตอบคำถาม 2Q ให้ครบทั้ง 2 ข้อครับ");
+        alert("กรุณาตอบคำถามเบื้องต้น (2Q) ให้ครบทั้ง 2 ข้อครับ");
         return;
     }
     
@@ -181,7 +182,7 @@ function submitAll() {
 }
 
 // ==========================================
-// 4. บันทึกผลและส่งข้อมูลไป Google Sheets
+// 4. บันทึกผลและส่งข้อมูลไป Google Sheets (แก้ปัญหาบล็อก CORS)
 // ==========================================
 function saveData(s9, s5, age, gender, job) {
     document.body.style.cursor = "wait";
@@ -200,10 +201,12 @@ function saveData(s9, s5, age, gender, job) {
     // ส่งข้อมูลเข้าฐานข้อมูล Google Sheets
     fetch(GOOGLE_SHEET_URL, {
         method: 'POST',
+        headers: {
+            'Content-Type': 'text/plain;charset=utf-8' // ป้องกันเบราว์เซอร์บล็อก
+        },
         body: JSON.stringify(newData)
     })
-    .then(response => response.json())
-    .then(result => {
+    .then(response => {
         document.body.style.cursor = "default"; 
         window.location.href = 'result.html'; 
     })
@@ -278,6 +281,14 @@ function loadResult() {
     }
 }
 
+function clearHistory() {
+    if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบประวัติการประเมินทั้งหมด?")) {
+        localStorage.removeItem('healHeartHistory');
+        localStorage.removeItem('healHeartResult');
+        window.location.reload();
+    }
+}
+
 // ==========================================
 // 6. 📊 ดึงข้อมูลจริงจาก Google Sheets มาสร้างกราฟและตัวเลข
 // ==========================================
@@ -290,7 +301,6 @@ async function renderStatsCharts() {
         let ageGroups = { "<15": 0, "15-20": 0, "21-30": 0, "31-40": 0, "41-50": 0, "50+": 0 };
         let visitDates = {};
         
-        // ตัวแปรนับจำนวนคนสำหรับกล่องด้านบน
         const totalUsers = allData.length;
         let dailyUsers = 0;
         let riskUsers = 0;
@@ -298,16 +308,15 @@ async function renderStatsCharts() {
         const today = new Date();
         const todayString = `${today.getDate()}/${today.getMonth()+1}/${today.getFullYear()}`;
 
-        // วนลูปนับข้อมูลจริงจากตาราง Google Sheets
         allData.forEach(row => {
             if(row[0]) {
                 const dateStr = row[0].split(' ')[0]; 
                 visitDates[dateStr] = (visitDates[dateStr] || 0) + 1;
-                if(dateStr === todayString) dailyUsers++; // นับคนเข้าวันนี้
+                if(dateStr === todayString) dailyUsers++; 
             }
 
-            const score9Q = parseInt(row[4]); // คอลัมน์ที่ 4 คือคะแนน 9Q
-            if(!isNaN(score9Q) && score9Q > 12) riskUsers++; // นับคนที่ความเสี่ยงสูง
+            const score9Q = parseInt(row[4]); 
+            if(!isNaN(score9Q) && score9Q >= 13) riskUsers++; // ตั้งค่าคะแนน 13 ขึ้นไปคือมีความเสี่ยง
 
             const age = parseInt(row[2]);
             if (!isNaN(age)) {
@@ -324,14 +333,14 @@ async function renderStatsCharts() {
             else if (job) jobCounts["ฟรีแลนซ์/อื่นๆ"]++;
         });
 
-        // 🟢 เปลี่ยนตัวเลข 128, 8540, 15% เป็นข้อมูลจริง
+        // อัปเดตตัวเลขในกล่อง 3 กล่อง
         if (document.getElementById('total-users')) document.getElementById('total-users').innerText = totalUsers.toLocaleString();
         if (document.getElementById('daily-users')) document.getElementById('daily-users').innerText = dailyUsers.toLocaleString();
         
         const riskPercent = totalUsers > 0 ? Math.round((riskUsers / totalUsers) * 100) : 0;
         if (document.getElementById('risk-users')) document.getElementById('risk-users').innerText = riskPercent + "%";
 
-        // 📈 วาดกราฟเส้น
+        // วาดกราฟเส้น
         new Chart(document.getElementById('dailyChart'), {
             type: 'line',
             data: {
@@ -340,7 +349,7 @@ async function renderStatsCharts() {
             }
         });
 
-        // 🍩 วาดกราฟวงกลม
+        // วาดกราฟวงกลม
         new Chart(document.getElementById('jobChart'), {
             type: 'doughnut',
             data: {
@@ -349,7 +358,7 @@ async function renderStatsCharts() {
             }
         });
 
-        // 📊 วาดกราฟแท่ง
+        // วาดกราฟแท่ง
         new Chart(document.getElementById('ageChart'), {
             type: 'bar',
             data: {
@@ -362,5 +371,3 @@ async function renderStatsCharts() {
         console.error("เกิดข้อผิดพลาดในการโหลดสถิติจริง:", error);
     }
 }
-
-
