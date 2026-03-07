@@ -1,7 +1,6 @@
 // ==========================================
 // ส่วนตั้งค่าระบบฐานข้อมูล (Google Sheets)
 // ==========================================
-// ลิงก์ Web App URL ของคุณ (ใส่ให้เรียบร้อยแล้วครับ!)
 const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbykgE_h5tzClR7Nt_0PPalCzqaSGjVhPyJtR1HXScPz2HA72RNct9AdyzX6jUPVdTEKlw/exec"; 
 
 // ==========================================
@@ -13,7 +12,8 @@ window.onload = function() {
     
     if (document.getElementById('questions-9q')) renderQuestions();
     if (document.getElementById('result-content')) loadResult();
-    if (document.getElementById('dailyChart')) renderStatsCharts();
+    // ปรับใหม่: ถ้าอยู่หน้าสถิติ ให้เรียกฟังก์ชันดึงข้อมูลจริง
+    if (document.getElementById('dailyChart')) renderRealStats(); 
 };
 
 function showDailyQuote() {
@@ -95,7 +95,6 @@ function goToStep2() {
     const q2_1 = document.querySelector('input[name="q2_1"]:checked')?.value;
     const q2_2 = document.querySelector('input[name="q2_2"]:checked')?.value;
     
-    // ถ้าข้อ 2Q ตอบไม่มีทั้งคู่ ถือว่าปกติ ส่งผลทันที
     if (q2_1 === 'no' && q2_2 === 'no') {
         saveData(0, 0, age, gender, job);
         return;
@@ -151,7 +150,6 @@ function submitAll() {
 // 4. บันทึกผลและส่งข้อมูลไป Google Sheets
 // ==========================================
 function saveData(s9, s5, age, gender, job) {
-    // เปลี่ยนเป้าเมาส์เป็นรูปกำลังโหลด
     document.body.style.cursor = "wait";
     
     const now = new Date();
@@ -159,13 +157,11 @@ function saveData(s9, s5, age, gender, job) {
 
     const newData = { score9Q: s9, scoreST5: s5, age: age, gender: gender, job: job, date: dateStr };
     
-    // ก. เก็บบันทึกประวัติลงในเครื่องผู้ใช้ (LocalStorage)
     let history = JSON.parse(localStorage.getItem('healHeartHistory')) || [];
     history.push(newData);
     localStorage.setItem('healHeartHistory', JSON.stringify(history));
     localStorage.setItem('healHeartResult', JSON.stringify(newData));
 
-    // ข. ส่งข้อมูลเข้าฐานข้อมูล Google Sheets
     fetch(GOOGLE_SHEET_URL, {
         method: 'POST',
         body: JSON.stringify(newData)
@@ -173,12 +169,11 @@ function saveData(s9, s5, age, gender, job) {
     .then(response => response.json())
     .then(result => {
         document.body.style.cursor = "default"; 
-        window.location.href = 'result.html'; // ส่งเสร็จแล้วเด้งไปหน้าผลลัพธ์
+        window.location.href = 'result.html';
     })
     .catch(error => {
         console.error('Error:', error);
         document.body.style.cursor = "default";
-        // ถ้าเน็ตหลุด ก็ยังให้ไปหน้าผลลัพธ์ได้ตามปกติ
         window.location.href = 'result.html'; 
     });
 }
@@ -212,12 +207,10 @@ function loadResult() {
             <h1 style="font-size:4.5rem; color:${color}; margin: 0;">${data.score9Q}</h1>
             <h2 style="color:${color}; margin-top: -10px;">${level}</h2>
             <p style="color:#636e72; margin-bottom: 20px;">(คะแนนความเครียด ST-5: <b>${data.scoreST5}</b>)</p>
-            
             <div style="background:#f8f9fa; padding:10px; border-radius:10px; font-size: 0.9rem;">
                 เพศ: ${data.gender} | อายุ: ${data.age} ปี | อาชีพ: ${data.job} <br>
                 <small style="color:#b2bec3;">ทำรายการเมื่อ: ${data.date}</small>
             </div>
-            
             <div style="background:${color}15; padding:20px; border-radius:15px; margin-top:20px; text-align: left;">
                 <h3 style="margin-bottom: 10px;">💡 คำแนะนำ:</h3>
                 <p>${advice}</p>
@@ -230,10 +223,9 @@ function loadResult() {
     const historySection = document.getElementById('history-section');
     const historyList = document.getElementById('history-list');
 
-    if (history.length > 1) {
+    if (history && history.length > 1) {
         historySection.classList.remove('hidden');
         const reversedHistory = [...history].reverse();
-        
         let historyHTML = '';
         reversedHistory.forEach((item, index) => {
             historyHTML += `
@@ -247,65 +239,79 @@ function loadResult() {
     }
 }
 
-function downloadResultImage() {
-    const resultCard = document.getElementById('result-content');
-    html2canvas(resultCard, { scale: 2, backgroundColor: "#ffffff" }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = 'Heal-Your-Heart-Result.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-    });
-}
+// ==========================================
+// 6. ดึงข้อมูลจริงมาทำกราฟสถิติ (Real-time)
+// ==========================================
+async function renderRealStats() {
+    try {
+        // ดึงข้อมูลจาก Google Sheets
+        const response = await fetch(GOOGLE_SHEET_URL);
+        const allData = await response.json(); 
 
-function clearHistory() {
-    if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบประวัติการประเมินทั้งหมด?")) {
-        localStorage.removeItem('healHeartHistory');
-        localStorage.removeItem('healHeartResult');
-        window.location.reload();
+        // 1. นัดจำนวนตามหมวดหมู่
+        let jobCounts = { "นักเรียน/นศ.": 0, "ข้าราชการ": 0, "พนักงานบริษัท": 0, "ธุรกิจ/ค้าขาย": 0, "ฟรีแลนซ์/อื่นๆ": 0 };
+        let ageGroups = { "<15": 0, "15-20": 0, "21-30": 0, "31-40": 0, "41-50": 0, "50+": 0 };
+        let visitDates = {};
+
+        allData.forEach(row => {
+            // วันที่ [0], เพศ [1], อายุ [2], อาชีพ [3], 9Q [4], ST-5 [5]
+            const dateStr = row[0].split(' ')[0]; // เอาแค่วันที่
+            visitDates[dateStr] = (visitDates[dateStr] || 0) + 1;
+
+            const age = parseInt(row[2]);
+            if (age < 15) ageGroups["<15"]++;
+            else if (age <= 20) ageGroups["15-20"]++;
+            else if (age <= 30) ageGroups["21-30"]++;
+            else if (age <= 40) ageGroups["31-40"]++;
+            else if (age <= 50) ageGroups["41-50"]++;
+            else ageGroups["50+"]++;
+
+            const job = row[3];
+            if (jobCounts.hasOwnProperty(job)) jobCounts[job]++;
+            else jobCounts["ฟรีแลนซ์/อื่นๆ"]++;
+        });
+
+        // 2. สร้างกราฟเส้น (คนเข้าชม)
+        new Chart(document.getElementById('dailyChart'), {
+            type: 'line',
+            data: {
+                labels: Object.keys(visitDates),
+                datasets: [{
+                    label: 'จำนวนผู้ทำแบบประเมิน (คน)',
+                    data: Object.values(visitDates),
+                    borderColor: '#ff758c',
+                    backgroundColor: 'rgba(255, 117, 140, 0.2)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            }
+        });
+
+        // 3. สร้างกราฟวงกลม (อาชีพ)
+        new Chart(document.getElementById('jobChart'), {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(jobCounts),
+                datasets: [{
+                    data: Object.values(jobCounts),
+                    backgroundColor: ['#ff758c', '#a29bfe', '#74b9ff', '#ffeaa7', '#fab1a0']
+                }]
+            }
+        });
+
+        // 4. สร้างกราฟแท่ง (อายุ)
+        new Chart(document.getElementById('ageChart'), {
+            type: 'bar',
+            data: {
+                labels: Object.keys(ageGroups),
+                datasets: [{
+                    label: 'จำนวนคน',
+                    data: Object.values(ageGroups),
+                    backgroundColor: '#fdcb6e'
+                }]
+            }
+        });
+    } catch (error) {
+        console.error("ดึงข้อมูลสถิติไม่สำเร็จ:", error);
     }
 }
-
-// ==========================================
-// 6. สร้างกราฟสถิติหน้าภาพรวม
-// ==========================================
-function renderStatsCharts() {
-    new Chart(document.getElementById('dailyChart'), {
-        type: 'line',
-        data: {
-            labels: ['จันทร์', 'อังคาร', 'พุธ', 'พฤหัส', 'ศุกร์', 'เสาร์', 'อาทิตย์'],
-            datasets: [{
-                label: 'ผู้เข้าชม (คน)',
-                data: [15, 22, 18, 25, 30, 45, 40],
-                borderColor: '#ff758c',
-                backgroundColor: 'rgba(255, 117, 140, 0.2)',
-                fill: true,
-                tension: 0.4
-            }]
-        }
-    });
-
-    new Chart(document.getElementById('jobChart'), {
-        type: 'doughnut',
-        data: {
-            labels: ['นักเรียน/นศ.', 'ข้าราชการ', 'พนักงานบริษัท', 'ธุรกิจ/ค้าขาย', 'ฟรีแลนซ์/อื่นๆ'],
-            datasets: [{
-                data: [35, 15, 25, 10, 15],
-                backgroundColor: ['#ff758c', '#a29bfe', '#74b9ff', '#ffeaa7', '#fab1a0']
-            }]
-        }
-    });
-
-    new Chart(document.getElementById('ageChart'), {
-        type: 'bar',
-        data: {
-            labels: ['<15', '15-20', '21-30', '31-40', '41-50', '50+'],
-            datasets: [{
-                label: 'จำนวนคน',
-                data: [5, 20, 40, 25, 15, 10],
-                backgroundColor: '#fdcb6e',
-                borderRadius: 5
-            }]
-        }
-    });
-}
-
