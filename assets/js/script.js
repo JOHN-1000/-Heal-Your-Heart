@@ -1,7 +1,8 @@
 // ==========================================
 // ส่วนตั้งค่าระบบฐานข้อมูล (Google Sheets)
 // ==========================================
-const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbykgE_h5tzClR7Nt_0PPalCzqaSGjVhPyJtR1HXScPz2HA72RNct9AdyzX6jUPVdTEKlw/exec"; 
+// ลิงก์ Web App URL จากเวอร์ชันล่าสุด (เวอร์ชัน 4)
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyzqJb0rqqaMR7lXSfTIl6PXQsuBU5aX-fpWH8rbE8bDrSOSCwPi8T5Rqlg5cvrH3USfAA/exec"; 
 
 // ==========================================
 // 1. โหลดระบบพื้นฐานเมื่อเปิดเว็บ
@@ -10,9 +11,10 @@ window.onload = function() {
     checkUser();
     showDailyQuote();
     
+    // ตรวจสอบ ID ของ Element ในหน้า HTML เพื่อเรียกใช้งานฟังก์ชันให้ถูกต้อง
     if (document.getElementById('questions-9q')) renderQuestions();
     if (document.getElementById('result-content')) loadResult();
-    // ปรับใหม่: ถ้าอยู่หน้าสถิติ ให้เรียกฟังก์ชันดึงข้อมูลจริง
+    // ถ้าพบกราฟ dailyChart แสดงว่าอยู่หน้า stats.html ให้ดึงข้อมูลจริงมาโชว์
     if (document.getElementById('dailyChart')) renderRealStats(); 
 };
 
@@ -23,10 +25,8 @@ function showDailyQuote() {
         "ร้องไห้บ้างก็ได้นะ น้ำตาจะช่วยชะล้างความเศร้าในใจ 🌧️",
         "ท้องฟ้ายังมีมืดมิดและสว่าง ใจเราก็มีวันอ่อนแอและเข้มแข็งได้เหมือนกัน ⛅",
         "อย่าลืมใจดีกับตัวเองให้มากๆ นะ คุณคู่ควรกับความรักเสมอ 🥰",
-        "ความผิดพลาดคือบทเรียน ไม่ใช่ตัวตัดสินคุณค่าในตัวคุณ 🌱",
         "วันนี้ทำเต็มที่แล้ว พรุ่งนี้ค่อยว่ากันใหม่นะ คืนนี้ฝันดี 🌙"
     ];
-
     const quoteElement = document.getElementById('daily-quote');
     if (quoteElement) {
         const randomIndex = Math.floor(Math.random() * quotes.length);
@@ -47,19 +47,23 @@ function toggleMobileMenu() {
 }
 
 // ==========================================
-// 2. เรนเดอร์คำถามแบบประเมิน (9Q และ ST-5)
+// 2. ระบบเรนเดอร์คำถาม (ดึงข้อมูลจาก ASSESSMENT_DATA)
 // ==========================================
 function renderQuestions() {
     const container9Q = document.getElementById('questions-9q');
     const containerST5 = document.getElementById('questions-st5');
 
-    ASSESSMENT_DATA.q9.forEach((q, i) => {
-        container9Q.innerHTML += createRadioHtml(`q9_${i}`, q, [0, 1, 2, 3], ["ไม่เลย", "บางวัน", "บ่อย", "ทุกวัน"]);
-    });
+    if(container9Q) {
+        ASSESSMENT_DATA.q9.forEach((q, i) => {
+            container9Q.innerHTML += createRadioHtml(`q9_${i}`, q, [0, 1, 2, 3], ["ไม่เลย", "บางวัน", "บ่อย", "ทุกวัน"]);
+        });
+    }
 
-    ASSESSMENT_DATA.st5.forEach((q, i) => {
-        containerST5.innerHTML += createRadioHtml(`st5_${i}`, q, [0, 1, 2, 3], ["แทบไม่มี", "เป็นบางครั้ง", "บ่อยครั้ง", "ประจำ"]);
-    });
+    if(containerST5) {
+        ASSESSMENT_DATA.st5.forEach((q, i) => {
+            containerST5.innerHTML += createRadioHtml(`st5_${i}`, q, [0, 1, 2, 3], ["แทบไม่มี", "เป็นบางครั้ง", "บ่อยครั้ง", "ประจำ"]);
+        });
+    }
 }
 
 function createRadioHtml(name, question, values, labels) {
@@ -77,241 +81,136 @@ function createRadioHtml(name, question, values, labels) {
 }
 
 // ==========================================
-// 3. ควบคุมการเปลี่ยนหน้าแบบประเมิน
+// 3. ระบบบันทึกข้อมูล (ส่งค่าไป Google Sheets)
 // ==========================================
-function goToStep2() {
-    const consent = document.getElementById('pdpa-consent').checked;
-    if (!consent) {
-        alert("⚠️ กรุณากดยอมรับเงื่อนไขการใช้งานก่อนดำเนินการต่อครับ");
-        return;
-    }
-
-    const age = document.getElementById('age').value;
-    const job = document.getElementById('job').value;
-    const gender = document.getElementById('gender').value;
-
-    if (!age) { alert("กรุณาระบุอายุก่อนครับ"); return; }
-
-    const q2_1 = document.querySelector('input[name="q2_1"]:checked')?.value;
-    const q2_2 = document.querySelector('input[name="q2_2"]:checked')?.value;
-    
-    if (q2_1 === 'no' && q2_2 === 'no') {
-        saveData(0, 0, age, gender, job);
-        return;
-    }
-
-    document.getElementById('step-1').classList.add('hidden');
-    document.getElementById('step-2').classList.remove('hidden');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function goToStep3() {
-    let answered9Q = true;
-    for (let i = 0; i < ASSESSMENT_DATA.q9.length; i++) {
-        if (!document.querySelector(`input[name="q9_${i}"]:checked`)) answered9Q = false;
-    }
-
-    if (!answered9Q) {
-        alert("กรุณาตอบคำถาม 9Q ให้ครบทุกข้อครับ 📝");
-        return;
-    }
-
-    document.getElementById('step-2').classList.add('hidden');
-    document.getElementById('step-3').classList.remove('hidden');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
 function submitAll() {
     let score9Q = 0, scoreST5 = 0;
-    let answeredST5 = true;
-
-    for (let i = 0; i < ASSESSMENT_DATA.q9.length; i++) {
-        score9Q += parseInt(document.querySelector(`input[name="q9_${i}"]:checked`).value);
+    
+    // รวมคะแนน 9Q
+    for (let i = 0; i < 9; i++) {
+        const sel = document.querySelector(`input[name="q9_${i}"]:checked`);
+        if (sel) score9Q += parseInt(sel.value);
     }
-
-    for (let i = 0; i < ASSESSMENT_DATA.st5.length; i++) {
+    // รวมคะแนน ST-5
+    for (let i = 0; i < 5; i++) {
         const sel = document.querySelector(`input[name="st5_${i}"]:checked`);
-        if (sel) scoreST5 += parseInt(sel.value); else answeredST5 = false;
-    }
-
-    if (!answeredST5) {
-        alert("กรุณาตอบคำถาม ST-5 ให้ครบทุกข้อครับ 📝");
-        return;
+        if (sel) scoreST5 += parseInt(sel.value);
     }
 
     const age = document.getElementById('age').value;
     const gender = document.getElementById('gender').value;
     const job = document.getElementById('job').value;
+
+    if (!age || !gender || !job) {
+        alert("กรุณากรอกข้อมูลส่วนตัวให้ครบถ้วนครับ");
+        return;
+    }
 
     saveData(score9Q, scoreST5, age, gender, job);
 }
 
-// ==========================================
-// 4. บันทึกผลและส่งข้อมูลไป Google Sheets
-// ==========================================
 function saveData(s9, s5, age, gender, job) {
     document.body.style.cursor = "wait";
-    
     const now = new Date();
-    const dateStr = `${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()} เวลา ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')} น.`;
-
-    const newData = { score9Q: s9, scoreST5: s5, age: age, gender: gender, job: job, date: dateStr };
+    const dateStr = `${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()} ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
     
-    let history = JSON.parse(localStorage.getItem('healHeartHistory')) || [];
-    history.push(newData);
-    localStorage.setItem('healHeartHistory', JSON.stringify(history));
+    // ข้อมูลที่จะส่งตรงกับโครงสร้างใน Apps Script
+    const newData = { date: dateStr, gender: gender, age: age, job: job, score9Q: s9, scoreST5: s5 };
+    
     localStorage.setItem('healHeartResult', JSON.stringify(newData));
 
+    // ส่งข้อมูลแบบ POST ไปยัง Google Sheets
     fetch(GOOGLE_SHEET_URL, {
         method: 'POST',
         body: JSON.stringify(newData)
     })
-    .then(response => response.json())
-    .then(result => {
-        document.body.style.cursor = "default"; 
+    .then(() => {
+        document.body.style.cursor = "default";
         window.location.href = 'result.html';
     })
     .catch(error => {
         console.error('Error:', error);
-        document.body.style.cursor = "default";
-        window.location.href = 'result.html'; 
+        window.location.href = 'result.html';
     });
 }
 
 // ==========================================
-// 5. แสดงผลลัพธ์และประวัติ
-// ==========================================
-function loadResult() {
-    const data = JSON.parse(localStorage.getItem('healHeartResult'));
-    const container = document.getElementById('result-content');
-    
-    if (!data) { container.innerHTML = "ไม่พบข้อมูล กรุณาทำแบบประเมินก่อนครับ"; return; }
-
-    let level, color, advice;
-    if (data.score9Q < 7) {
-        level = "ปกติ"; color = "#00b894"; advice = "สุขภาพจิตดีเยี่ยม! รักษาความสดใสไว้นะครับ ✨";
-    } else if (data.score9Q <= 12) {
-        level = "ระดับน้อย (Mild)"; color = "#fdcb6e"; advice = "มีความเครียดนิดหน่อย ลองพักผ่อนฟังเพลงดูนะครับ 🎧";
-    } else if (data.score9Q <= 18) {
-        level = "ระดับปานกลาง"; color = "#e17055"; advice = "เริ่มมีความเสี่ยง ควรปรึกษาผู้เชี่ยวชาญครับ 🧡";
-    } else {
-        level = "ระดับรุนแรง"; color = "#d63031"; advice = "⚠️ ควรไปพบแพทย์โดยเร็วที่สุด เพื่อรับการดูแลครับ";
-    }
-
-    let emergencyBtn = (data.score9Q > 12) ? 
-        `<a href="tel:1323" class="btn-main" style="background:#d63031; margin-top:10px;">🚨 โทรสายด่วน 1323</a>` : "";
-
-    container.innerHTML = `
-        <div class="text-center">
-            <h3 style="color:#636e72;">ผลการประเมินของคุณ</h3>
-            <h1 style="font-size:4.5rem; color:${color}; margin: 0;">${data.score9Q}</h1>
-            <h2 style="color:${color}; margin-top: -10px;">${level}</h2>
-            <p style="color:#636e72; margin-bottom: 20px;">(คะแนนความเครียด ST-5: <b>${data.scoreST5}</b>)</p>
-            <div style="background:#f8f9fa; padding:10px; border-radius:10px; font-size: 0.9rem;">
-                เพศ: ${data.gender} | อายุ: ${data.age} ปี | อาชีพ: ${data.job} <br>
-                <small style="color:#b2bec3;">ทำรายการเมื่อ: ${data.date}</small>
-            </div>
-            <div style="background:${color}15; padding:20px; border-radius:15px; margin-top:20px; text-align: left;">
-                <h3 style="margin-bottom: 10px;">💡 คำแนะนำ:</h3>
-                <p>${advice}</p>
-                <div class="text-center">${emergencyBtn}</div>
-            </div>
-        </div>
-    `;
-
-    const history = JSON.parse(localStorage.getItem('healHeartHistory')) || [];
-    const historySection = document.getElementById('history-section');
-    const historyList = document.getElementById('history-list');
-
-    if (history && history.length > 1) {
-        historySection.classList.remove('hidden');
-        const reversedHistory = [...history].reverse();
-        let historyHTML = '';
-        reversedHistory.forEach((item, index) => {
-            historyHTML += `
-                <div style="border-bottom: 1px dashed #eee; padding: 10px 0;">
-                    <b>ครั้งที่ ${history.length - index}</b> <span style="color:#b2bec3; font-size:0.8rem;">(${item.date})</span><br>
-                    <span style="color:#2d3436">คะแนนซึมเศร้า: <b>${item.score9Q}</b> | คะแนนความเครียด: <b>${item.scoreST5}</b></span>
-                </div>
-            `;
-        });
-        historyList.innerHTML = historyHTML;
-    }
-}
-
-// ==========================================
-// 6. ดึงข้อมูลจริงมาทำกราฟสถิติ (Real-time)
+// 4. ระบบดึงข้อมูลมาแสดงสถิติจริง (GET)
 // ==========================================
 async function renderRealStats() {
     try {
-        // ดึงข้อมูลจาก Google Sheets
+        // ดึงข้อมูลผ่าน doGet ใน Apps Script
         const response = await fetch(GOOGLE_SHEET_URL);
         const allData = await response.json(); 
 
-        // 1. นัดจำนวนตามหมวดหมู่
         let jobCounts = { "นักเรียน/นศ.": 0, "ข้าราชการ": 0, "พนักงานบริษัท": 0, "ธุรกิจ/ค้าขาย": 0, "ฟรีแลนซ์/อื่นๆ": 0 };
-        let ageGroups = { "<15": 0, "15-20": 0, "21-30": 0, "31-40": 0, "41-50": 0, "50+": 0 };
         let visitDates = {};
 
         allData.forEach(row => {
-            // วันที่ [0], เพศ [1], อายุ [2], อาชีพ [3], 9Q [4], ST-5 [5]
-            const dateStr = row[0].split(' ')[0]; // เอาแค่วันที่
+            // row[0]=วันที่, row[3]=อาชีพ
+            const dateStr = row[0].split(' ')[0]; 
             visitDates[dateStr] = (visitDates[dateStr] || 0) + 1;
-
-            const age = parseInt(row[2]);
-            if (age < 15) ageGroups["<15"]++;
-            else if (age <= 20) ageGroups["15-20"]++;
-            else if (age <= 30) ageGroups["21-30"]++;
-            else if (age <= 40) ageGroups["31-40"]++;
-            else if (age <= 50) ageGroups["41-50"]++;
-            else ageGroups["50+"]++;
-
+            
             const job = row[3];
             if (jobCounts.hasOwnProperty(job)) jobCounts[job]++;
             else jobCounts["ฟรีแลนซ์/อื่นๆ"]++;
         });
 
-        // 2. สร้างกราฟเส้น (คนเข้าชม)
+        // อัปเดตตัวเลขรวมในหน้าเว็บ
+        const totalUsers = allData.length;
+        const totalElement = document.querySelector('.stats-card h1'); // เข้าถึงตัวเลขสรุป
+        if (totalElement) totalElement.innerText = totalUsers.toLocaleString();
+
+        // สร้างกราฟเส้น (จำนวนคนทำแบบทดสอบ)
         new Chart(document.getElementById('dailyChart'), {
             type: 'line',
             data: {
                 labels: Object.keys(visitDates),
-                datasets: [{
-                    label: 'จำนวนผู้ทำแบบประเมิน (คน)',
-                    data: Object.values(visitDates),
-                    borderColor: '#ff758c',
-                    backgroundColor: 'rgba(255, 117, 140, 0.2)',
+                datasets: [{ 
+                    label: 'จำนวนผู้ใช้งาน', 
+                    data: Object.values(visitDates), 
+                    borderColor: '#ff758c', 
+                    backgroundColor: 'rgba(255, 117, 140, 0.1)',
                     fill: true,
                     tension: 0.4
                 }]
             }
         });
 
-        // 3. สร้างกราฟวงกลม (อาชีพ)
+        // สร้างกราฟวงกลม (สัดส่วนอาชีพ)
         new Chart(document.getElementById('jobChart'), {
             type: 'doughnut',
             data: {
                 labels: Object.keys(jobCounts),
-                datasets: [{
-                    data: Object.values(jobCounts),
-                    backgroundColor: ['#ff758c', '#a29bfe', '#74b9ff', '#ffeaa7', '#fab1a0']
+                datasets: [{ 
+                    data: Object.values(jobCounts), 
+                    backgroundColor: ['#ff758c', '#a29bfe', '#74b9ff', '#ffeaa7', '#fab1a0'] 
                 }]
             }
         });
 
-        // 4. สร้างกราฟแท่ง (อายุ)
-        new Chart(document.getElementById('ageChart'), {
-            type: 'bar',
-            data: {
-                labels: Object.keys(ageGroups),
-                datasets: [{
-                    label: 'จำนวนคน',
-                    data: Object.values(ageGroups),
-                    backgroundColor: '#fdcb6e'
-                }]
-            }
-        });
-    } catch (error) {
-        console.error("ดึงข้อมูลสถิติไม่สำเร็จ:", error);
+    } catch (e) {
+        console.error("ไม่สามารถโหลดสถิติได้:", e);
     }
+}
+
+// ==========================================
+// 5. แสดงผลลัพธ์หน้าสุดท้าย
+// ==========================================
+function loadResult() {
+    const data = JSON.parse(localStorage.getItem('healHeartResult'));
+    const container = document.getElementById('result-content');
+    if (!data || !container) return;
+
+    let color = data.score9Q < 7 ? "#00b894" : (data.score9Q <= 12 ? "#fdcb6e" : "#d63031");
+    
+    container.innerHTML = `
+        <div class="text-center">
+            <h1 style="font-size:4rem; color:${color}; margin:0;">${data.score9Q}</h1>
+            <p style="margin-top:0;">(คะแนน ST-5: ${data.scoreST5})</p>
+            <div style="background:#f8f9fa; padding:10px; border-radius:10px; margin-top:15px;">
+                <small>ทำรายการเมื่อ: ${data.date}</small>
+            </div>
+        </div>
+    `;
 }
