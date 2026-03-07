@@ -2,7 +2,7 @@
 // ส่วนตั้งค่าระบบฐานข้อมูล (Google Sheets)
 // ==========================================
 // ลิงก์ Web App URL ของคุณ
-const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbykgE_h5tzClR7Nt_0PPalCzqaSGjVhPyJtR1HXScPz2HA72RNct9AdyzX6jUPVdTEKlw/exec"; 
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyzqJb0rqqaMR7lXSfTIl6PXQsuBU5aX-fpWH8rbE8bDrSOSCwPi8T5Rqlg5cvrH3USfAA/exec"; 
 
 // ==========================================
 // 1. โหลดระบบพื้นฐานเมื่อเปิดเว็บ
@@ -11,9 +11,12 @@ window.onload = function() {
     checkUser();
     showDailyQuote();
     
-    if (document.getElementById('questions-9q')) renderQuestions();
+    // ตรวจสอบหน้าเพื่อเรียกฟังก์ชันให้ตรงกับ Element ที่มี
+    if (document.getElementById('questions-2q') || document.getElementById('questions-9q')) renderQuestions();
     if (document.getElementById('result-content')) loadResult();
-    if (document.getElementById('dailyChart')) renderStatsCharts(); // ดึงสถิติจริง
+    
+    // ถ้าอยู่หน้าสถิติ ให้ดึงข้อมูลจริงจาก Google Sheets
+    if (document.getElementById('dailyChart')) renderStatsCharts(); 
 };
 
 function showDailyQuote() {
@@ -26,7 +29,6 @@ function showDailyQuote() {
         "ความผิดพลาดคือบทเรียน ไม่ใช่ตัวตัดสินคุณค่าในตัวคุณ 🌱",
         "วันนี้ทำเต็มที่แล้ว พรุ่งนี้ค่อยว่ากันใหม่นะ คืนนี้ฝันดี 🌙"
     ];
-
     const quoteElement = document.getElementById('daily-quote');
     if (quoteElement) {
         const randomIndex = Math.floor(Math.random() * quotes.length);
@@ -47,19 +49,43 @@ function toggleMobileMenu() {
 }
 
 // ==========================================
-// 2. เรนเดอร์คำถามแบบประเมิน (9Q และ ST-5)
+// 2. เรนเดอร์คำถามแบบประเมิน (ดึงข้อมูลจากไฟล์ data.js)
 // ==========================================
 function renderQuestions() {
+    const container2Q = document.getElementById('questions-2q');
     const container9Q = document.getElementById('questions-9q');
     const containerST5 = document.getElementById('questions-st5');
 
-    ASSESSMENT_DATA.q9.forEach((q, i) => {
-        container9Q.innerHTML += createRadioHtml(`q9_${i}`, q, [0, 1, 2, 3], ["ไม่เลย", "บางวัน", "บ่อย", "ทุกวัน"]);
-    });
+    // เรนเดอร์ 2Q
+    if (container2Q) {
+        container2Q.innerHTML = "";
+        ASSESSMENT_DATA.q2.forEach((q) => {
+            container2Q.innerHTML += `
+                <div class="form-group" style="border-bottom:1px solid #f0f0f0; padding-bottom:15px;">
+                    <label class="form-label">${q.text}</label>
+                    <div class="radio-tile-group">
+                        <label class="radio-tile-label"><input type="radio" name="${q.id}" value="yes"> <div class="radio-tile">มี</div></label>
+                        <label class="radio-tile-label"><input type="radio" name="${q.id}" value="no"> <div class="radio-tile">ไม่มี</div></label>
+                    </div>
+                </div>`;
+        });
+    }
 
-    ASSESSMENT_DATA.st5.forEach((q, i) => {
-        containerST5.innerHTML += createRadioHtml(`st5_${i}`, q, [0, 1, 2, 3], ["แทบไม่มี", "เป็นบางครั้ง", "บ่อยครั้ง", "ประจำ"]);
-    });
+    // เรนเดอร์ 9Q
+    if (container9Q) {
+        container9Q.innerHTML = "";
+        ASSESSMENT_DATA.q9.forEach((q, i) => {
+            container9Q.innerHTML += createRadioHtml(`q9_${i}`, q, [0, 1, 2, 3], ["ไม่เลย", "บางวัน", "บ่อย", "ทุกวัน"]);
+        });
+    }
+
+    // เรนเดอร์ ST-5
+    if (containerST5) {
+        containerST5.innerHTML = "";
+        ASSESSMENT_DATA.st5.forEach((q, i) => {
+            containerST5.innerHTML += createRadioHtml(`st5_${i}`, q, [0, 1, 2, 3], ["แทบไม่มี", "บางครั้ง", "บ่อยครั้ง", "ประจำ"]);
+        });
+    }
 }
 
 function createRadioHtml(name, question, values, labels) {
@@ -69,7 +95,7 @@ function createRadioHtml(name, question, values, labels) {
     values.forEach((val, idx) => {
         html += `<label class="radio-tile-label">
                 <input type="radio" name="${name}" value="${val}">
-                <div class="radio-tile">${labels[idx]} (${val})</div>
+                <div class="radio-tile">${labels[idx]}</div>
             </label>`;
     });
     html += `</div></div>`;
@@ -80,8 +106,8 @@ function createRadioHtml(name, question, values, labels) {
 // 3. ควบคุมการเปลี่ยนหน้าแบบประเมิน
 // ==========================================
 function goToStep2() {
-    const consent = document.getElementById('pdpa-consent').checked;
-    if (!consent) {
+    const consent = document.getElementById('pdpa-consent')?.checked;
+    if (document.getElementById('pdpa-consent') && !consent) {
         alert("⚠️ กรุณากดยอมรับเงื่อนไขการใช้งานก่อนดำเนินการต่อครับ");
         return;
     }
@@ -90,12 +116,20 @@ function goToStep2() {
     const job = document.getElementById('job').value;
     const gender = document.getElementById('gender').value;
 
-    if (!age) { alert("กรุณาระบุอายุก่อนครับ"); return; }
+    if (!age || !gender || !job) { 
+        alert("กรุณาระบุข้อมูลส่วนตัวให้ครบถ้วนก่อนครับ"); 
+        return; 
+    }
 
     const q2_1 = document.querySelector('input[name="q2_1"]:checked')?.value;
     const q2_2 = document.querySelector('input[name="q2_2"]:checked')?.value;
+
+    if (!q2_1 || !q2_2) {
+        alert("กรุณาตอบคำถาม 2Q ให้ครบทั้ง 2 ข้อครับ");
+        return;
+    }
     
-    // ถ้าข้อ 2Q ตอบไม่มีทั้งคู่ ถือว่าปกติ ส่งผลทันที
+    // ถ้า 2Q ตอบไม่มีทั้งคู่ ถือว่าปกติ ส่งผลทันที
     if (q2_1 === 'no' && q2_2 === 'no') {
         saveData(0, 0, age, gender, job);
         return;
@@ -127,7 +161,8 @@ function submitAll() {
     let answeredST5 = true;
 
     for (let i = 0; i < ASSESSMENT_DATA.q9.length; i++) {
-        score9Q += parseInt(document.querySelector(`input[name="q9_${i}"]:checked`).value);
+        const sel = document.querySelector(`input[name="q9_${i}"]:checked`);
+        if (sel) score9Q += parseInt(sel.value);
     }
 
     for (let i = 0; i < ASSESSMENT_DATA.st5.length; i++) {
@@ -151,21 +186,20 @@ function submitAll() {
 // 4. บันทึกผลและส่งข้อมูลไป Google Sheets
 // ==========================================
 function saveData(s9, s5, age, gender, job) {
-    // เปลี่ยนเป้าเมาส์เป็นรูปกำลังโหลด
     document.body.style.cursor = "wait";
     
     const now = new Date();
-    const dateStr = `${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()} เวลา ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')} น.`;
+    const dateStr = `${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()} ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
 
     const newData = { score9Q: s9, scoreST5: s5, age: age, gender: gender, job: job, date: dateStr };
     
-    // ก. เก็บบันทึกประวัติลงในเครื่องผู้ใช้ (LocalStorage)
+    // บันทึกประวัติลงในเครื่องผู้ใช้
     let history = JSON.parse(localStorage.getItem('healHeartHistory')) || [];
     history.push(newData);
     localStorage.setItem('healHeartHistory', JSON.stringify(history));
     localStorage.setItem('healHeartResult', JSON.stringify(newData));
 
-    // ข. ส่งข้อมูลเข้าฐานข้อมูล Google Sheets
+    // ส่งข้อมูลเข้าฐานข้อมูล Google Sheets
     fetch(GOOGLE_SHEET_URL, {
         method: 'POST',
         body: JSON.stringify(newData)
@@ -173,7 +207,7 @@ function saveData(s9, s5, age, gender, job) {
     .then(response => response.json())
     .then(result => {
         document.body.style.cursor = "default"; 
-        window.location.href = 'result.html'; // ส่งเสร็จแล้วเด้งไปหน้าผลลัพธ์
+        window.location.href = 'result.html'; 
     })
     .catch(error => {
         console.error('Error:', error);
@@ -229,7 +263,7 @@ function loadResult() {
     const historySection = document.getElementById('history-section');
     const historyList = document.getElementById('history-list');
 
-    if (history.length > 1) {
+    if (historySection && history.length > 1) {
         historySection.classList.remove('hidden');
         const reversedHistory = [...history].reverse();
         
@@ -242,53 +276,41 @@ function loadResult() {
                 </div>
             `;
         });
-        historyList.innerHTML = historyHTML;
-    }
-}
-
-function downloadResultImage() {
-    const resultCard = document.getElementById('result-content');
-    html2canvas(resultCard, { scale: 2, backgroundColor: "#ffffff" }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = 'Heal-Your-Heart-Result.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-    });
-}
-
-function clearHistory() {
-    if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบประวัติการประเมินทั้งหมด?")) {
-        localStorage.removeItem('healHeartHistory');
-        localStorage.removeItem('healHeartResult');
-        window.location.reload();
+        if(historyList) historyList.innerHTML = historyHTML;
     }
 }
 
 // ==========================================
-// 6. 📊 ดึงข้อมูลจริงจาก Google Sheets มาสร้างกราฟ
+// 6. 📊 ดึงข้อมูลจริงจาก Google Sheets มาสร้างกราฟและตัวเลข
 // ==========================================
 async function renderStatsCharts() {
     try {
-        // ดึงข้อมูลจริงจาก Google Sheets
         const response = await fetch(GOOGLE_SHEET_URL);
         const allData = await response.json(); 
 
-        // สร้างตัวแปรเตรียมนับจำนวน
         let jobCounts = { "นักเรียน/นศ.": 0, "ข้าราชการ": 0, "พนักงานบริษัท": 0, "ธุรกิจ/ค้าขาย": 0, "ฟรีแลนซ์/อื่นๆ": 0 };
         let ageGroups = { "<15": 0, "15-20": 0, "21-30": 0, "31-40": 0, "41-50": 0, "50+": 0 };
         let visitDates = {};
+        
+        // ตัวแปรนับจำนวนคนสำหรับกล่องด้านบน
+        const totalUsers = allData.length;
+        let dailyUsers = 0;
+        let riskUsers = 0;
+        
+        const today = new Date();
+        const todayString = `${today.getDate()}/${today.getMonth()+1}/${today.getFullYear()}`;
 
-        // วนลูปนับข้อมูลแต่ละแถว
+        // วนลูปนับข้อมูลจริงจากตาราง Google Sheets
         allData.forEach(row => {
-            // วันที่ [0], เพศ [1], อายุ [2], อาชีพ [3]
-            
-            // 1. นับวันที่
             if(row[0]) {
                 const dateStr = row[0].split(' ')[0]; 
                 visitDates[dateStr] = (visitDates[dateStr] || 0) + 1;
+                if(dateStr === todayString) dailyUsers++; // นับคนเข้าวันนี้
             }
 
-            // 2. นับอายุ
+            const score9Q = parseInt(row[4]); // คอลัมน์ที่ 4 คือคะแนน 9Q
+            if(!isNaN(score9Q) && score9Q > 12) riskUsers++; // นับคนที่ความเสี่ยงสูง
+
             const age = parseInt(row[2]);
             if (!isNaN(age)) {
                 if (age < 15) ageGroups["<15"]++;
@@ -299,59 +321,42 @@ async function renderStatsCharts() {
                 else ageGroups["50+"]++;
             }
 
-            // 3. นับอาชีพ
             const job = row[3];
-            if (jobCounts.hasOwnProperty(job)) {
-                jobCounts[job]++;
-            } else if (job) {
-                jobCounts["ฟรีแลนซ์/อื่นๆ"]++;
-            }
+            if (jobCounts.hasOwnProperty(job)) jobCounts[job]++;
+            else if (job) jobCounts["ฟรีแลนซ์/อื่นๆ"]++;
         });
 
-        // อัปเดตตัวเลขรวมบนหน้าเว็บ (ถ้ามี Element มารับ)
-        const totalUsers = allData.length;
-        const totalElement = document.querySelector('.stats-card h1'); 
-        if (totalElement) totalElement.innerText = totalUsers.toLocaleString();
+        // 🟢 เปลี่ยนตัวเลข 128, 8540, 15% เป็นข้อมูลจริง
+        if (document.getElementById('total-users')) document.getElementById('total-users').innerText = totalUsers.toLocaleString();
+        if (document.getElementById('daily-users')) document.getElementById('daily-users').innerText = dailyUsers.toLocaleString();
+        
+        const riskPercent = totalUsers > 0 ? Math.round((riskUsers / totalUsers) * 100) : 0;
+        if (document.getElementById('risk-users')) document.getElementById('risk-users').innerText = riskPercent + "%";
 
-        // 📈 วาดกราฟเส้น (จำนวนคนเข้าชม)
+        // 📈 วาดกราฟเส้น
         new Chart(document.getElementById('dailyChart'), {
             type: 'line',
             data: {
                 labels: Object.keys(visitDates),
-                datasets: [{
-                    label: 'ผู้ใช้งานจริง (คน)',
-                    data: Object.values(visitDates),
-                    borderColor: '#ff758c',
-                    backgroundColor: 'rgba(255, 117, 140, 0.2)',
-                    fill: true,
-                    tension: 0.4
-                }]
+                datasets: [{ label: 'ผู้ใช้งานจริง (คน)', data: Object.values(visitDates), borderColor: '#ff758c', backgroundColor: 'rgba(255, 117, 140, 0.2)', fill: true, tension: 0.4 }]
             }
         });
 
-        // 🍩 วาดกราฟวงกลม (อาชีพ)
+        // 🍩 วาดกราฟวงกลม
         new Chart(document.getElementById('jobChart'), {
             type: 'doughnut',
             data: {
                 labels: Object.keys(jobCounts),
-                datasets: [{
-                    data: Object.values(jobCounts),
-                    backgroundColor: ['#ff758c', '#a29bfe', '#74b9ff', '#ffeaa7', '#fab1a0']
-                }]
+                datasets: [{ data: Object.values(jobCounts), backgroundColor: ['#ff758c', '#a29bfe', '#74b9ff', '#ffeaa7', '#fab1a0'] }]
             }
         });
 
-        // 📊 วาดกราฟแท่ง (อายุ)
+        // 📊 วาดกราฟแท่ง
         new Chart(document.getElementById('ageChart'), {
             type: 'bar',
             data: {
                 labels: Object.keys(ageGroups),
-                datasets: [{
-                    label: 'จำนวนคน',
-                    data: Object.values(ageGroups),
-                    backgroundColor: '#fdcb6e',
-                    borderRadius: 5
-                }]
+                datasets: [{ label: 'จำนวนคน', data: Object.values(ageGroups), backgroundColor: '#fdcb6e', borderRadius: 5 }]
             }
         });
 
