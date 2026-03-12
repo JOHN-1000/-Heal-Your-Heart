@@ -182,41 +182,40 @@ function submitAll() {
 }
 
 // ==========================================
-// 4. บันทึกผลและส่งข้อมูลไป Google Sheets (แก้ปัญหาบล็อก CORS)
+// 4. บันทึกและส่งข้อมูล (เวอร์ชันแช่แข็งจับ Error)
 // ==========================================
 function saveData(s9, s5, age, gender, job) {
     document.body.style.cursor = "wait";
     
     const now = new Date();
     const dateStr = `${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()} ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
-
     const newData = { score9Q: s9, scoreST5: s5, age: age, gender: gender, job: job, date: dateStr };
     
-    // บันทึกประวัติลงในเครื่องผู้ใช้
     let history = JSON.parse(localStorage.getItem('healHeartHistory')) || [];
     history.push(newData);
     localStorage.setItem('healHeartHistory', JSON.stringify(history));
     localStorage.setItem('healHeartResult', JSON.stringify(newData));
 
-    // ส่งข้อมูลเข้าฐานข้อมูล Google Sheets
+    console.log("🚀 กำลังส่งข้อมูลไปที่:", GOOGLE_SHEET_URL);
+
+    // ส่งข้อมูล (ถอดโหมดกันบล็อกออก เพื่อให้มันพ่น Error ออกมาให้เราเห็น)
     fetch(GOOGLE_SHEET_URL, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'text/plain;charset=utf-8' // ป้องกันเบราว์เซอร์บล็อก
-        },
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(newData)
     })
     .then(response => {
+        // ถ้าส่งสำเร็จจริงๆ ถึงจะยอมให้เปลี่ยนหน้า
         document.body.style.cursor = "default"; 
         window.location.href = 'result.html'; 
     })
     .catch(error => {
-        console.error('Error:', error);
+        // 🚨 ถ้าส่งพัง! จะหยุดการเปลี่ยนหน้า แล้วโชว์ข้อความแจ้งเตือน
+        console.error('❌ พังตรงนี้ครับ! สาเหตุ:', error);
+        alert("ส่งข้อมูลไม่เข้า Google Sheets!\n\nสาเหตุ: " + error.message + "\n\nรบกวนแคปหน้าต่าง Console ตอนนี้ส่งให้ผมดูได้เลยครับ!");
         document.body.style.cursor = "default";
-        window.location.href = 'result.html'; 
     });
 }
-
 // ==========================================
 // 5. แสดงผลลัพธ์และประวัติ
 // ==========================================
@@ -371,4 +370,5 @@ async function renderStatsCharts() {
         console.error("เกิดข้อผิดพลาดในการโหลดสถิติจริง:", error);
     }
 }
+
 
