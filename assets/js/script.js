@@ -159,14 +159,13 @@ function submitAll() {
 }
 
 // ==========================================
-// 4. บันทึกและส่งข้อมูลไป Google Sheets
+// 4. บันทึกและส่งข้อมูลไป Google Sheets (ขั้นเด็ดขาด)
 // ==========================================
 function saveData(s9, s5, age, gender, job) {
     document.body.style.cursor = "wait";
     
     const now = new Date();
     const dateStr = `${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()} ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
-
     const newData = { score9Q: s9, scoreST5: s5, age: age, gender: gender, job: job, date: dateStr };
     
     let history = JSON.parse(localStorage.getItem('healHeartHistory')) || [];
@@ -174,8 +173,13 @@ function saveData(s9, s5, age, gender, job) {
     localStorage.setItem('healHeartHistory', JSON.stringify(history));
     localStorage.setItem('healHeartResult', JSON.stringify(newData));
 
+    // 🚨 เด้งแจ้งเตือนบนหน้าจอ เพื่อเช็คว่ามันใช้ลิงก์ใหม่หรือยัง!
+    alert("ระบบกำลังส่งข้อมูลไปที่ลิงก์นี้:\n\n" + GOOGLE_SHEET_URL + "\n\n(เช็คดูว่าตรงกับลิงก์ล่าสุดใน Apps Script ไหม)");
+
+    // ส่งข้อมูลแบบบังคับทะลุบล็อก (no-cors)
     fetch(GOOGLE_SHEET_URL, {
         method: 'POST',
+        mode: 'no-cors', 
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(newData)
     })
@@ -184,12 +188,11 @@ function saveData(s9, s5, age, gender, job) {
         window.location.href = 'result.html'; 
     })
     .catch(error => {
-        console.error('Error:', error);
+        alert("ส่งข้อมูลไม่สำเร็จ: " + error.message);
         document.body.style.cursor = "default";
         window.location.href = 'result.html'; 
     });
 }
-
 // ==========================================
 // 5. แสดงผลลัพธ์หน้า result.html
 // ==========================================
@@ -347,6 +350,7 @@ async function renderStatsCharts() {
         console.error("เกิดข้อผิดพลาดในการโหลดสถิติจริง:", error);
     }
 }
+
 
 
 
