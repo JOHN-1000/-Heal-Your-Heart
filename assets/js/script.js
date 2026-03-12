@@ -1,7 +1,7 @@
 // ==========================================
 // 🚨 นำลิงก์ Web App URL ตัวใหม่สุด มาวางในบรรทัดนี้ครับ 🚨
 // ==========================================
-const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxePNJbNi6Ke7UkTbCZ_1vd9-6GW8p8kRq_nupbMcZeMQX66G3Yo105U7cRKbTKTz1RWA/exec"; 
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyskl0lWrc-O_nXfpBNSjopLQLvc_A878JjIaPPPp02SH7CxhYIq6t5l3T6GBy7bCCX/exec"; 
 
 window.onload = function() {
     checkUser();
@@ -350,6 +350,7 @@ async function renderStatsCharts() {
         console.error("เกิดข้อผิดพลาดในการโหลดสถิติจริง:", error);
     }
 }
+
 
 
 
