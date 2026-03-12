@@ -1,20 +1,13 @@
 // ==========================================
-// ส่วนตั้งค่าระบบฐานข้อมูล (Google Sheets)
+// 🚨 นำลิงก์ Web App URL ตัวใหม่สุด มาวางในบรรทัดนี้ครับ 🚨
 // ==========================================
-const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycb...vWwzisQ/exec";
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxePNJbNi6Ke7UkTbCZ_1vd9-6GW8p8kRq_nupbMcZeMQX66G3Yo105U7cRKbTKTz1RWA/exec"; 
 
-// ==========================================
-// 1. โหลดระบบพื้นฐานเมื่อเปิดเว็บ
-// ==========================================
 window.onload = function() {
     checkUser();
     showDailyQuote();
-    
-    // ตรวจสอบหน้าเพื่อเรียกฟังก์ชันให้ตรงกับ Element ที่มี
     if (document.getElementById('questions-2q') || document.getElementById('questions-9q')) renderQuestions();
     if (document.getElementById('result-content')) loadResult();
-    
-    // ถ้าอยู่หน้าสถิติ ให้ดึงข้อมูลจริงจาก Google Sheets
     if (document.getElementById('dailyChart')) renderStatsCharts(); 
 };
 
@@ -25,37 +18,27 @@ function showDailyQuote() {
         "ร้องไห้บ้างก็ได้นะ น้ำตาจะช่วยชะล้างความเศร้าในใจ 🌧️",
         "ท้องฟ้ายังมีมืดมิดและสว่าง ใจเราก็มีวันอ่อนแอและเข้มแข็งได้เหมือนกัน ⛅",
         "อย่าลืมใจดีกับตัวเองให้มากๆ นะ คุณคู่ควรกับความรักเสมอ 🥰",
-        "ความผิดพลาดคือบทเรียน ไม่ใช่ตัวตัดสินคุณค่าในตัวคุณ 🌱",
-        "วันนี้ทำเต็มที่แล้ว พรุ่งนี้ค่อยว่ากันใหม่นะ คืนนี้ฝันดี 🌙"
+        "ความผิดพลาดคือบทเรียน ไม่ใช่ตัวตัดสินคุณค่าในตัวคุณ 🌱"
     ];
     const quoteElement = document.getElementById('daily-quote');
-    if (quoteElement) {
-        const randomIndex = Math.floor(Math.random() * quotes.length);
-        quoteElement.innerText = quotes[randomIndex];
-    }
+    if (quoteElement) quoteElement.innerText = quotes[Math.floor(Math.random() * quotes.length)];
 }
 
 function checkUser() {
     const user = localStorage.getItem('userName');
     const displayElement = document.getElementById('user-display');
-    if (user && displayElement) {
-        displayElement.innerText = `สวัสดีคุณ ${user} 👋`;
-    }
+    if (user && displayElement) displayElement.innerText = `สวัสดีคุณ ${user} 👋`;
 }
 
 function toggleMobileMenu() {
     document.querySelector('.nav-links').classList.toggle('active');
 }
 
-// ==========================================
-// 2. เรนเดอร์คำถามแบบประเมิน (ดึงจาก data.js)
-// ==========================================
 function renderQuestions() {
     const container2Q = document.getElementById('questions-2q');
     const container9Q = document.getElementById('questions-9q');
     const containerST5 = document.getElementById('questions-st5');
 
-    // เรนเดอร์ 2Q
     if (container2Q && typeof ASSESSMENT_DATA !== 'undefined' && ASSESSMENT_DATA.q2) {
         container2Q.innerHTML = "";
         ASSESSMENT_DATA.q2.forEach((q) => {
@@ -70,7 +53,6 @@ function renderQuestions() {
         });
     }
 
-    // เรนเดอร์ 9Q
     if (container9Q && typeof ASSESSMENT_DATA !== 'undefined' && ASSESSMENT_DATA.q9) {
         container9Q.innerHTML = "";
         ASSESSMENT_DATA.q9.forEach((q, i) => {
@@ -78,7 +60,6 @@ function renderQuestions() {
         });
     }
 
-    // เรนเดอร์ ST-5
     if (containerST5 && typeof ASSESSMENT_DATA !== 'undefined' && ASSESSMENT_DATA.st5) {
         containerST5.innerHTML = "";
         ASSESSMENT_DATA.st5.forEach((q, i) => {
@@ -101,9 +82,6 @@ function createRadioHtml(name, question, values, labels) {
     return html;
 }
 
-// ==========================================
-// 3. ควบคุมการเปลี่ยนหน้าแบบประเมิน
-// ==========================================
 function goToStep2() {
     const pdpaCheckbox = document.getElementById('pdpa-consent');
     if (pdpaCheckbox && !pdpaCheckbox.checked) {
@@ -128,7 +106,6 @@ function goToStep2() {
         return;
     }
     
-    // ถ้า 2Q ตอบไม่มีทั้งคู่ ถือว่าปกติ ส่งผลทันที
     if (q2_1 === 'no' && q2_2 === 'no') {
         saveData(0, 0, age, gender, job);
         return;
@@ -182,13 +159,14 @@ function submitAll() {
 }
 
 // ==========================================
-// 4. บันทึกและส่งข้อมูล (เวอร์ชันแช่แข็งจับ Error)
+// 4. บันทึกและส่งข้อมูลไป Google Sheets
 // ==========================================
 function saveData(s9, s5, age, gender, job) {
     document.body.style.cursor = "wait";
     
     const now = new Date();
     const dateStr = `${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()} ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+
     const newData = { score9Q: s9, scoreST5: s5, age: age, gender: gender, job: job, date: dateStr };
     
     let history = JSON.parse(localStorage.getItem('healHeartHistory')) || [];
@@ -196,28 +174,24 @@ function saveData(s9, s5, age, gender, job) {
     localStorage.setItem('healHeartHistory', JSON.stringify(history));
     localStorage.setItem('healHeartResult', JSON.stringify(newData));
 
-    console.log("🚀 กำลังส่งข้อมูลไปที่:", GOOGLE_SHEET_URL);
-
-    // ส่งข้อมูล (ถอดโหมดกันบล็อกออก เพื่อให้มันพ่น Error ออกมาให้เราเห็น)
     fetch(GOOGLE_SHEET_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(newData)
     })
-    .then(response => {
-        // ถ้าส่งสำเร็จจริงๆ ถึงจะยอมให้เปลี่ยนหน้า
+    .then(() => {
         document.body.style.cursor = "default"; 
         window.location.href = 'result.html'; 
     })
     .catch(error => {
-        // 🚨 ถ้าส่งพัง! จะหยุดการเปลี่ยนหน้า แล้วโชว์ข้อความแจ้งเตือน
-        console.error('❌ พังตรงนี้ครับ! สาเหตุ:', error);
-        alert("ส่งข้อมูลไม่เข้า Google Sheets!\n\nสาเหตุ: " + error.message + "\n\nรบกวนแคปหน้าต่าง Console ตอนนี้ส่งให้ผมดูได้เลยครับ!");
+        console.error('Error:', error);
         document.body.style.cursor = "default";
+        window.location.href = 'result.html'; 
     });
 }
+
 // ==========================================
-// 5. แสดงผลลัพธ์และประวัติ
+// 5. แสดงผลลัพธ์หน้า result.html
 // ==========================================
 function loadResult() {
     const data = JSON.parse(localStorage.getItem('healHeartResult'));
@@ -236,11 +210,10 @@ function loadResult() {
         level = "ระดับรุนแรง"; color = "#d63031"; advice = "⚠️ ควรไปพบแพทย์โดยเร็วที่สุด เพื่อรับการดูแลครับ";
     }
 
-    let emergencyBtn = (data.score9Q > 12) ? 
-        `<a href="tel:1323" class="btn-main" style="background:#d63031; margin-top:10px;">🚨 โทรสายด่วน 1323</a>` : "";
+    let emergencyBtn = (data.score9Q > 12) ? `<a href="tel:1323" class="btn-main" style="background:#d63031; margin-top:10px;">🚨 โทรสายด่วน 1323</a>` : "";
 
     container.innerHTML = `
-        <div class="text-center">
+        <div class="text-center" id="capture-area">
             <h3 style="color:#636e72;">ผลการประเมินของคุณ</h3>
             <h1 style="font-size:4.5rem; color:${color}; margin: 0;">${data.score9Q}</h1>
             <h2 style="color:${color}; margin-top: -10px;">${level}</h2>
@@ -254,7 +227,7 @@ function loadResult() {
             <div style="background:${color}15; padding:20px; border-radius:15px; margin-top:20px; text-align: left;">
                 <h3 style="margin-bottom: 10px;">💡 คำแนะนำ:</h3>
                 <p>${advice}</p>
-                <div class="text-center">${emergencyBtn}</div>
+                <div class="text-center" data-html2canvas-ignore="true">${emergencyBtn}</div>
             </div>
         </div>
     `;
@@ -280,6 +253,23 @@ function loadResult() {
     }
 }
 
+// ==========================================
+// 💡 ฟังก์ชันปุ่มโหลดรูป (ที่เคยหายไป กลับมาแล้ว!)
+// ==========================================
+function downloadResultImage() {
+    const captureArea = document.getElementById('capture-area') || document.getElementById('result-content');
+    if (typeof html2canvas !== 'undefined') {
+        html2canvas(captureArea, { scale: 2, backgroundColor: "#ffffff" }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = 'Heal-Your-Heart-Result.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+    } else {
+        alert("ขออภัยครับ ระบบจับภาพยังไม่พร้อมทำงาน (ไม่มี html2canvas)");
+    }
+}
+
 function clearHistory() {
     if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบประวัติการประเมินทั้งหมด?")) {
         localStorage.removeItem('healHeartHistory');
@@ -289,7 +279,7 @@ function clearHistory() {
 }
 
 // ==========================================
-// 6. 📊 ดึงข้อมูลจริงจาก Google Sheets มาสร้างกราฟและตัวเลข
+// 6. ดึงข้อมูลจริงจาก Google Sheets มาสร้างกราฟ
 // ==========================================
 async function renderStatsCharts() {
     try {
@@ -315,7 +305,7 @@ async function renderStatsCharts() {
             }
 
             const score9Q = parseInt(row[4]); 
-            if(!isNaN(score9Q) && score9Q >= 13) riskUsers++; // ตั้งค่าคะแนน 13 ขึ้นไปคือมีความเสี่ยง
+            if(!isNaN(score9Q) && score9Q >= 13) riskUsers++;
 
             const age = parseInt(row[2]);
             if (!isNaN(age)) {
@@ -332,38 +322,25 @@ async function renderStatsCharts() {
             else if (job) jobCounts["ฟรีแลนซ์/อื่นๆ"]++;
         });
 
-        // อัปเดตตัวเลขในกล่อง 3 กล่อง
         if (document.getElementById('total-users')) document.getElementById('total-users').innerText = totalUsers.toLocaleString();
         if (document.getElementById('daily-users')) document.getElementById('daily-users').innerText = dailyUsers.toLocaleString();
         
         const riskPercent = totalUsers > 0 ? Math.round((riskUsers / totalUsers) * 100) : 0;
         if (document.getElementById('risk-users')) document.getElementById('risk-users').innerText = riskPercent + "%";
 
-        // วาดกราฟเส้น
         new Chart(document.getElementById('dailyChart'), {
             type: 'line',
-            data: {
-                labels: Object.keys(visitDates),
-                datasets: [{ label: 'ผู้ใช้งานจริง (คน)', data: Object.values(visitDates), borderColor: '#ff758c', backgroundColor: 'rgba(255, 117, 140, 0.2)', fill: true, tension: 0.4 }]
-            }
+            data: { labels: Object.keys(visitDates), datasets: [{ label: 'ผู้ใช้งานจริง (คน)', data: Object.values(visitDates), borderColor: '#ff758c', backgroundColor: 'rgba(255, 117, 140, 0.2)', fill: true, tension: 0.4 }] }
         });
 
-        // วาดกราฟวงกลม
         new Chart(document.getElementById('jobChart'), {
             type: 'doughnut',
-            data: {
-                labels: Object.keys(jobCounts),
-                datasets: [{ data: Object.values(jobCounts), backgroundColor: ['#ff758c', '#a29bfe', '#74b9ff', '#ffeaa7', '#fab1a0'] }]
-            }
+            data: { labels: Object.keys(jobCounts), datasets: [{ data: Object.values(jobCounts), backgroundColor: ['#ff758c', '#a29bfe', '#74b9ff', '#ffeaa7', '#fab1a0'] }] }
         });
 
-        // วาดกราฟแท่ง
         new Chart(document.getElementById('ageChart'), {
             type: 'bar',
-            data: {
-                labels: Object.keys(ageGroups),
-                datasets: [{ label: 'จำนวนคน', data: Object.values(ageGroups), backgroundColor: '#fdcb6e', borderRadius: 5 }]
-            }
+            data: { labels: Object.keys(ageGroups), datasets: [{ label: 'จำนวนคน', data: Object.values(ageGroups), backgroundColor: '#fdcb6e', borderRadius: 5 }] }
         });
 
     } catch (error) {
