@@ -1,7 +1,7 @@
 // ==========================================
 // ส่วนตั้งค่าระบบฐานข้อมูล (Google Sheets)
 // ==========================================
-const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxXGDWBqvltT4R1qbC9_kh33wfcD6bztBvKlfuO0QsjAQM791nUJ4bh_zYbfc0_0nmaaQ/exec"; 
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycb...vWwzisQ/exec";
 
 // ==========================================
 // 1. โหลดระบบพื้นฐานเมื่อเปิดเว็บ
@@ -371,3 +371,4 @@ async function renderStatsCharts() {
         console.error("เกิดข้อผิดพลาดในการโหลดสถิติจริง:", error);
     }
 }
+
