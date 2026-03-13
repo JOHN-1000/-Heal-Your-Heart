@@ -46,25 +46,20 @@ body {
     z-index: 1000;
 }
 
-/* ✨ อัปเกรดโลโก้ให้ใหญ่และเด่นขึ้นตามคำขอ */
 .logo {
     font-family: 'Mitr', sans-serif;
-    font-size: 1.85rem;      /* ขยายขนาดตัวหนังสือ */
-    font-weight: 700;        /* เพิ่มความหนา */
+    font-size: 1.85rem;      /* ขนาดใหญ่สะใจในหน้าคอม */
+    font-weight: 700;
     color: var(--primary);
     text-transform: uppercase;
-    letter-spacing: 1px;     /* เพิ่มระยะห่างให้อ่านง่ายและดูแพง */
+    letter-spacing: 1px;
+    white-space: nowrap;     /* บังคับไม่ให้ขึ้นบรรทัดใหม่ */
 }
 
 .logo a {
     text-decoration: none;
     color: inherit;
     transition: 0.3s;
-}
-
-.logo a:hover {
-    opacity: 0.8;
-    text-shadow: 0 0 10px rgba(255, 117, 140, 0.2);
 }
 
 .nav-links {
@@ -86,7 +81,7 @@ body {
 }
 
 /* ==========================================================================
-   3. Layout & Cards
+   3. Layout & UI Elements
    ========================================================================== */
 .container {
     max-width: 1000px;
@@ -105,27 +100,20 @@ body {
     transition: transform 0.3s;
 }
 
-.card:hover { transform: translateY(-5px); }
 .text-center { text-align: center; }
 
 h1, h2, h3 {
     font-family: 'Mitr', sans-serif;
     color: var(--text-main);
-    margin-bottom: 15px;
 }
 
-/* ==========================================================================
-   4. Buttons & Forms (UI Elements)
-   ========================================================================== */
-
-/* 🎯 ปุ่มหลัก: จัดกลางอัตโนมัติ และเว้นระยะห่างสวยงาม */
 .btn-main {
     display: block !important;
     margin-left: auto !important;
     margin-right: auto !important;
     background: var(--primary-gradient);
     color: white;
-    padding: 14px 35px;      /* เพิ่มความอวบอิ่มของปุ่ม */
+    padding: 14px 35px;
     border-radius: 50px;
     text-decoration: none;
     border: none;
@@ -134,10 +122,9 @@ h1, h2, h3 {
     box-shadow: 0 5px 15px rgba(255, 117, 140, 0.4);
     transition: 0.3s;
     text-align: center;
-    min-width: 260px;        /* ปรับขนาดให้มาตรฐานขึ้น */
-    max-width: 320px;        /* คุมความยาวหน้าแรกไม่ให้ยาวเกินไป */
-    box-sizing: border-box;
-    margin-bottom: 18px;     /* เว้นระยะห่างระหว่างปุ่มตามคำขอ */
+    min-width: 260px;
+    max-width: 320px;
+    margin-bottom: 18px;
 }
 
 .btn-main:hover { 
@@ -145,81 +132,36 @@ h1, h2, h3 {
     box-shadow: 0 8px 25px rgba(255, 117, 140, 0.6);
 }
 
-/* Radio Tiles (ตัวเลือกคำถามที่เด้งได้) */
-.radio-tile-group {
-    display: flex;
-    gap: 15px;
-    width: 100%;
-    margin-top: 10px;
-}
-
-.radio-tile-label {
-    flex: 1;
-    cursor: pointer;
-    position: relative;
-}
-
-.radio-tile-label input {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
+/* Radio Tiles (ตัวเลือกที่เด้งได้) */
+.radio-tile-group { display: flex; gap: 15px; width: 100%; margin-top: 10px; }
+.radio-tile-label { flex: 1; cursor: pointer; position: relative; }
+.radio-tile-label input { position: absolute; opacity: 0; width: 0; height: 0; }
 .radio-tile {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    min-height: 55px;
-    padding: 15px;
-    border: 2px solid #f1f2f6;
-    border-radius: 12px;
-    background-color: #ffffff;
-    color: var(--text-muted);
-    font-size: 1.1rem;
-    font-weight: 500;
-    transition: all 0.2s ease-in-out;
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; min-height: 55px; padding: 15px;
+    border: 2px solid #f1f2f6; border-radius: 12px;
+    background-color: #ffffff; color: var(--text-muted);
+    font-size: 1.1rem; font-weight: 500; transition: 0.2s;
 }
-
-.radio-tile-label:hover .radio-tile {
-    border-color: #ffb8c6;
-    background-color: #fff9fa;
-}
-
 .radio-tile-label input:checked + .radio-tile {
-    background-color: var(--primary);
-    border-color: var(--primary);
-    color: white;
-    box-shadow: 0 8px 20px rgba(255, 117, 140, 0.3);
-    transform: translateY(-3px);
-    font-weight: bold;
+    background-color: var(--primary); border-color: var(--primary);
+    color: white; box-shadow: 0 8px 20px rgba(255, 117, 140, 0.3);
+    transform: translateY(-3px); font-weight: bold;
 }
 
 /* ==========================================================================
-   5. News, Stats & Food
+   4. Stats & News
    ========================================================================== */
 .grid-2-chart { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-@media (max-width: 768px) { .grid-2-chart { grid-template-columns: 1fr; } }
-
 #daily-article-container {
-    max-width: 900px;
-    margin: 0 auto;
-    background: #fff;
-    border-radius: var(--radius);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
-    overflow: hidden;
-    display: flex;
-    flex-wrap: wrap;
+    max-width: 900px; margin: 0 auto; background: #fff;
+    border-radius: var(--radius); box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    overflow: hidden; display: flex; flex-wrap: wrap;
 }
-
 .stats-section {
-    margin-top: 40px;
-    padding: 50px 20px;
-    background-color: #fff9fa;
-    border-top: 2px dashed #ffe0e6;
+    margin-top: 40px; padding: 50px 20px;
+    background-color: #fff9fa; border-top: 2px dashed #ffe0e6;
 }
-
 .stat-card-group { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-bottom: 30px; }
 .stat-card {
     flex: 1; min-width: 200px; background: white; padding: 25px; 
@@ -227,17 +169,32 @@ h1, h2, h3 {
 }
 
 /* ==========================================================================
-   6. Utilities & Animations
+   5. Mobile Responsive (แก้ตามรูปที่ 2)
+   ========================================================================== */
+@media (max-width: 900px) {
+    .nav-links { display: none; } /* ซ่อนเมนูปกติเพื่อใช้แฮมเบอร์เกอร์ */
+}
+
+@media (max-width: 600px) {
+    /* ✨ แก้ไขโลโก้ในมือถือให้สั้นและพอดีเหมือนรูปที่ 2 */
+    .logo { 
+        font-size: 1.3rem;      /* หดขนาดตัวหนังสือลง */
+        letter-spacing: -0.5px; /* บีบตัวอักษรให้ชิดกันนิดนึงเพื่อให้สั้นลง */
+    }
+    
+    .navbar { padding: 0.8rem 4%; } /* ลด padding ของบาร์ให้น้อยลง */
+    
+    .radio-tile-group { flex-direction: column; }
+    .btn-main { min-width: 100%; }
+    .grid-2-chart { grid-template-columns: 1fr; }
+}
+
+/* ==========================================================================
+   6. Utilities
    ========================================================================== */
 .hidden { display: none !important; }
 .fade-in { animation: fadeIn 0.8s; }
 @keyframes fadeIn { 
     from { opacity: 0; transform: translateY(20px); } 
     to { opacity: 1; transform: translateY(0); } 
-}
-
-@media (max-width: 600px) {
-    .logo { font-size: 1.45rem; }
-    .radio-tile-group { flex-direction: column; }
-    .btn-main { min-width: 100%; }
 }
