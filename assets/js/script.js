@@ -443,3 +443,15 @@ function loadDailyArticle() {
         </div>
     `;
 }
+// ฟังก์ชันสำหรับเปิด-ปิดเมนูในมือถือ
+function toggleMobileMenu() {
+    const navLinks = document.querySelector('.nav-links');
+    navLinks.classList.toggle('active');
+}
+
+// เพิ่มการปิดเมนูอัตโนมัติเมื่อกดลิงก์ (เผื่อหน้าเดิม)
+document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', () => {
+        document.querySelector('.nav-links').classList.remove('active');
+    });
+});
