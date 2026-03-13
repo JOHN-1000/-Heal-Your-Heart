@@ -46,19 +46,22 @@ body {
     z-index: 1000;
 }
 
+/* ✨ อัปเกรดโลโก้: ขนาดใหญ่สะใจในหน้าคอม */
 .logo {
     font-family: 'Mitr', sans-serif;
-    font-size: 1.85rem;      /* ขนาดใหญ่สะใจในหน้าคอม */
+    font-size: 1.85rem;
     font-weight: 700;
     color: var(--primary);
     text-transform: uppercase;
     letter-spacing: 1px;
-    white-space: nowrap;     /* บังคับไม่ให้ขึ้นบรรทัดใหม่ */
 }
 
 .logo a {
     text-decoration: none;
     color: inherit;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     transition: 0.3s;
 }
 
@@ -78,6 +81,13 @@ body {
 .nav-links a:hover, .nav-links a.active {
     color: var(--primary);
     border-bottom: 2px solid var(--primary);
+}
+
+.hamburger {
+    display: none;
+    font-size: 1.6rem;
+    cursor: pointer;
+    color: var(--text-main);
 }
 
 /* ==========================================================================
@@ -105,6 +115,7 @@ body {
 h1, h2, h3 {
     font-family: 'Mitr', sans-serif;
     color: var(--text-main);
+    margin-bottom: 15px;
 }
 
 .btn-main {
@@ -132,7 +143,7 @@ h1, h2, h3 {
     box-shadow: 0 8px 25px rgba(255, 117, 140, 0.6);
 }
 
-/* Radio Tiles (ตัวเลือกที่เด้งได้) */
+/* Radio Tiles (ตัวเลือกคำถามเด้งได้) */
 .radio-tile-group { display: flex; gap: 15px; width: 100%; margin-top: 10px; }
 .radio-tile-label { flex: 1; cursor: pointer; position: relative; }
 .radio-tile-label input { position: absolute; opacity: 0; width: 0; height: 0; }
@@ -150,7 +161,7 @@ h1, h2, h3 {
 }
 
 /* ==========================================================================
-   4. Stats & News
+   4. Stats & News Sections
    ========================================================================== */
 .grid-2-chart { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 #daily-article-container {
@@ -169,24 +180,37 @@ h1, h2, h3 {
 }
 
 /* ==========================================================================
-   5. Mobile Responsive (แก้ตามรูปที่ 2)
+   5. 📱 Mobile Responsive (แก้โลโก้ให้เหมือนรูปเป๊ะๆ)
    ========================================================================== */
 @media (max-width: 900px) {
-    .nav-links { display: none; } /* ซ่อนเมนูปกติเพื่อใช้แฮมเบอร์เกอร์ */
+    .nav-links { display: none; }
+    .hamburger { display: block; }
 }
 
 @media (max-width: 600px) {
-    /* ✨ แก้ไขโลโก้ในมือถือให้สั้นและพอดีเหมือนรูปที่ 2 */
+    /* 1. จัดระเบียบบาร์ให้โลโก้และเมนูอยู่ขอบพอดี */
+    .navbar {
+        padding: 0.8rem 4% !important;
+    }
+
+    /* 2. บีบขนาดโลโก้ให้เรียงแถวเดียว ไม่ซ้อนกัน */
     .logo { 
-        font-size: 1.3rem;      /* หดขนาดตัวหนังสือลง */
-        letter-spacing: -0.5px; /* บีบตัวอักษรให้ชิดกันนิดนึงเพื่อให้สั้นลง */
+        font-size: 1.35rem !important; /* ขนาดพอดีเป๊ะกับจอมือถือ */
+        letter-spacing: -0.2px;       /* บีบช่องไฟนิดหน่อยเพื่อให้สั้นลง */
+        white-space: nowrap;          /* บังคับไม่ให้ขึ้นบรรทัดใหม่ */
     }
     
-    .navbar { padding: 0.8rem 4%; } /* ลด padding ของบาร์ให้น้อยลง */
-    
-    .radio-tile-group { flex-direction: column; }
-    .btn-main { min-width: 100%; }
+    .logo a {
+        gap: 6px; /* ลดระยะห่างระหว่างหัวใจกับตัวหนังสือเล็กน้อยในมือถือ */
+    }
+
+    /* 3. ปรับขนาด UI อื่นๆ ในมือถือ */
+    .radio-tile-group { flex-direction: column; gap: 10px; }
+    .btn-main { min-width: 100%; max-width: 100%; }
     .grid-2-chart { grid-template-columns: 1fr; }
+    
+    .container { margin: 20px auto; }
+    .card { padding: 25px; }
 }
 
 /* ==========================================================================
