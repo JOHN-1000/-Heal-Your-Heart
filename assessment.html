@@ -64,21 +64,29 @@
                 </label>
             </div>
 
-            <button class="btn-main w-100" onclick="goToStep2()" style="margin-top: 20px;">ดำเนินการต่อ ➔</button>
+            <div style="text-align: center; margin-top: 30px; width: 100%;">
+                <button class="btn-main" onclick="goToStep2()" style="min-width: 200px;">ดำเนินการต่อ ➔</button>
+            </div>
         </div>
 
         <div id="step-2" class="card hidden">
             <h2 style="color: #ff758c; text-align: center; margin-bottom: 20px;">3. แบบประเมินโรคซึมเศร้า (9Q)</h2>
             <p style="text-align: center; color: #636e72; margin-bottom: 20px;">ในช่วง 2 สัปดาห์ที่ผ่านมา ท่านมีอาการเหล่านี้บ่อยแค่ไหน?</p>
             <div id="questions-9q"></div>
-            <button class="btn-main w-100" onclick="goToStep3()" style="margin-top: 20px;">ดำเนินการต่อ ➔</button>
+            
+            <div style="text-align: center; margin-top: 30px; width: 100%;">
+                <button class="btn-main" onclick="goToStep3()" style="min-width: 200px;">ดำเนินการต่อ ➔</button>
+            </div>
         </div>
 
         <div id="step-3" class="card hidden">
             <h2 style="color: #ff758c; text-align: center; margin-bottom: 20px;">4. แบบประเมินความเครียด (ST-5)</h2>
             <p style="text-align: center; color: #636e72; margin-bottom: 20px;">ในช่วง 2-4 สัปดาห์ที่ผ่านมา ท่านมีอาการเหล่านี้บ่อยแค่ไหน?</p>
             <div id="questions-st5"></div>
-            <button class="btn-main w-100" onclick="submitAll()" style="margin-top: 20px;">ส่งข้อมูล ✔️</button>
+            
+            <div style="text-align: center; margin-top: 30px; width: 100%;">
+                <button class="btn-main" onclick="submitAll()" style="min-width: 200px;">ส่งข้อมูล ✔️</button>
+            </div>
         </div>
 
     </div>
@@ -87,4 +95,3 @@
     <script src="assets/js/script.js"></script>
 </body>
 </html>
-
