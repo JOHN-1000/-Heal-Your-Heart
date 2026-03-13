@@ -277,11 +277,10 @@ function clearHistory() {
 }
 
 // ==========================================
-// 6. 📊 กราฟสถิติ (อัปเกรดหน้าตาให้พรีเมียมมืออาชีพ)
+// 6. 📊 กราฟสถิติ (แก้ปัญหา Google Sheets แปลงวันที่ + อัปเกรดหน้าตา)
 // ==========================================
 async function renderStatsCharts() {
     try {
-        // ตั้งค่าให้ฟอนต์กราฟเป็น Sarabun ตรงกับหน้าเว็บ
         Chart.defaults.font.family = "'Sarabun', sans-serif";
         Chart.defaults.color = "#636e72";
 
@@ -297,13 +296,35 @@ async function renderStatsCharts() {
         let riskUsers = 0;
         
         const today = new Date();
-        const todayString = `${today.getDate()}/${today.getMonth()+1}/${today.getFullYear()}`;
 
         allData.forEach(row => {
             if(row[0]) {
-                const dateStr = row[0].split(' ')[0]; 
-                visitDates[dateStr] = (visitDates[dateStr] || 0) + 1;
-                if(dateStr === todayString) dailyUsers++; 
+                // 🚨 ดักจับและแปลงวันที่ ที่ Google Sheets แอบเปลี่ยน
+                let d, m, y;
+                let dateString = String(row[0]);
+                
+                if (dateString.includes('T')) {
+                    // กรณี Google Sheets แปลงเป็นเวลาสากล
+                    let dt = new Date(dateString);
+                    d = dt.getDate();
+                    m = dt.getMonth() + 1;
+                    y = dt.getFullYear();
+                } else {
+                    // กรณีเป็นข้อความปกติที่เราส่งไป
+                    let parts = dateString.split(' ')[0].split('/');
+                    d = parseInt(parts[0]);
+                    m = parseInt(parts[1]);
+                    y = parseInt(parts[2]);
+                }
+
+                // สร้างวันที่แบบสวยงามสำหรับโชว์ในกราฟ (เช่น 13/3/2026)
+                const cleanDateStr = `${d}/${m}/${y}`;
+                visitDates[cleanDateStr] = (visitDates[cleanDateStr] || 0) + 1;
+
+                // ตรวจสอบว่าเป็น "วันนี้" หรือไม่
+                if (d === today.getDate() && m === (today.getMonth() + 1) && y === today.getFullYear()) {
+                    dailyUsers++; 
+                }
             }
 
             const score9Q = parseInt(row[4]); 
@@ -332,7 +353,7 @@ async function renderStatsCharts() {
         const riskPercent = totalUsers > 0 ? Math.round((riskUsers / totalUsers) * 100) : 0;
         if (document.getElementById('risk-users')) document.getElementById('risk-users').innerText = riskPercent + "%";
 
-        // 📈 1. กราฟจำนวนผู้ใช้งาน (ซ่อนเส้นตารางรกๆ ทำให้ดูคลีน)
+        // 📈 1. กราฟจำนวนผู้ใช้งาน
         new Chart(document.getElementById('dailyChart'), {
             type: 'line',
             data: { 
@@ -343,7 +364,7 @@ async function renderStatsCharts() {
                     borderColor: '#ff758c', 
                     backgroundColor: 'rgba(255, 117, 140, 0.15)', 
                     fill: true, 
-                    tension: 0.4, // ทำให้เส้นโค้งสวยงาม
+                    tension: 0.4,
                     pointBackgroundColor: '#ff758c',
                     pointBorderWidth: 2,
                     pointRadius: 4
@@ -354,12 +375,12 @@ async function renderStatsCharts() {
                 plugins: { legend: { display: false } },
                 scales: {
                     y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { borderDash: [5, 5] } },
-                    x: { grid: { display: false } } // ปิดเส้นแนวตั้ง
+                    x: { grid: { display: false } }
                 }
             }
         });
 
-        // 🍩 2. กราฟวงกลมอาชีพ (ปรับให้ทันสมัย มีมิติ)
+        // 🍩 2. กราฟวงกลมอาชีพ
         new Chart(document.getElementById('jobChart'), {
             type: 'doughnut',
             data: { 
@@ -373,14 +394,14 @@ async function renderStatsCharts() {
             },
             options: {
                 responsive: true,
-                cutout: '70%', // เจาะรูตรงกลางให้ใหญ่ขึ้น ดูคลีน
+                cutout: '70%', 
                 plugins: { 
                     legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true } } 
                 }
             }
         });
 
-        // 📊 3. กราฟอายุ (โค้งมนน่ารัก)
+        // 📊 3. กราฟอายุ
         new Chart(document.getElementById('ageChart'), {
             type: 'bar',
             data: { 
@@ -389,7 +410,7 @@ async function renderStatsCharts() {
                     label: ' จำนวนคน', 
                     data: Object.values(ageGroups), 
                     backgroundColor: '#fdcb6e', 
-                    borderRadius: 8, // ปรับให้มุมแท่งกราฟโค้งมน
+                    borderRadius: 8, 
                     barPercentage: 0.6
                 }] 
             },
