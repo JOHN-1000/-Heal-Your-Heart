@@ -46,21 +46,27 @@ body {
     z-index: 1000;
 }
 
+/* ✨ อัปเกรดโลโก้ให้ใหญ่และเด่นขึ้นตามคำขอ */
 .logo {
     font-family: 'Mitr', sans-serif;
-    font-size: 1.8rem;   /* 👈 เพิ่มเป็น 1.8 หรือ 2.0 ตามความชอบครับ */
-    font-weight: 700;    /* 👈 บังคับความหนาให้ชัดเจน */
+    font-size: 1.85rem;      /* ขยายขนาดตัวหนังสือ */
+    font-weight: 700;        /* เพิ่มความหนา */
     color: var(--primary);
     text-transform: uppercase;
-    letter-spacing: 1px; /* 👈 เพิ่มระยะห่างตัวอักษรนิดหน่อยให้ดูแพง */
+    letter-spacing: 1px;     /* เพิ่มระยะห่างให้อ่านง่ายและดูแพง */
 }
 
-/* แถม: ทำให้โลโก้หดขนาดลงนิดนึงเวลาดูในมือถือ จะได้ไม่ล้น */
-@media (max-width: 600px) {
-    .logo {
-        font-size: 1.4rem;
-    }
+.logo a {
+    text-decoration: none;
+    color: inherit;
+    transition: 0.3s;
 }
+
+.logo a:hover {
+    opacity: 0.8;
+    text-shadow: 0 0 10px rgba(255, 117, 140, 0.2);
+}
+
 .nav-links {
     list-style: none;
     display: flex;
@@ -77,22 +83,6 @@ body {
 .nav-links a:hover, .nav-links a.active {
     color: var(--primary);
     border-bottom: 2px solid var(--primary);
-}
-
-@media (max-width: 900px) {
-    .nav-links {
-        display: none;
-        position: absolute;
-        top: 70px;
-        left: 0;
-        width: 100%;
-        background: white;
-        flex-direction: column;
-        padding: 20px;
-        box-shadow: var(--shadow);
-        text-align: center;
-    }
-    .nav-links.active { display: flex; }
 }
 
 /* ==========================================================================
@@ -125,17 +115,17 @@ h1, h2, h3 {
 }
 
 /* ==========================================================================
-   4. UI Elements (Buttons & Forms)
+   4. Buttons & Forms (UI Elements)
    ========================================================================== */
 
-/* ปุ่มหลัก (จัดกลางอัตโนมัติ) */
+/* 🎯 ปุ่มหลัก: จัดกลางอัตโนมัติ และเว้นระยะห่างสวยงาม */
 .btn-main {
     display: block !important;
     margin-left: auto !important;
     margin-right: auto !important;
     background: var(--primary-gradient);
     color: white;
-    padding: 12px 35px;
+    padding: 14px 35px;      /* เพิ่มความอวบอิ่มของปุ่ม */
     border-radius: 50px;
     text-decoration: none;
     border: none;
@@ -144,21 +134,18 @@ h1, h2, h3 {
     box-shadow: 0 5px 15px rgba(255, 117, 140, 0.4);
     transition: 0.3s;
     text-align: center;
-    min-width: 250px;
-    max-width: 100%;
+    min-width: 260px;        /* ปรับขนาดให้มาตรฐานขึ้น */
+    max-width: 320px;        /* คุมความยาวหน้าแรกไม่ให้ยาวเกินไป */
     box-sizing: border-box;
-    margin-bottom: 15px;
+    margin-bottom: 18px;     /* เว้นระยะห่างระหว่างปุ่มตามคำขอ */
 }
 
 .btn-main:hover { 
     transform: scale(1.05); 
-    box-shadow: 0 8px 20px rgba(255, 117, 140, 0.6);
+    box-shadow: 0 8px 25px rgba(255, 117, 140, 0.6);
 }
 
-.form-group { margin-bottom: 20px; text-align: left; }
-.form-label { font-weight: bold; margin-bottom: 8px; display: block; }
-
-/* Radio Tiles (ตัวเลือกคำถาม) */
+/* Radio Tiles (ตัวเลือกคำถามที่เด้งได้) */
 .radio-tile-group {
     display: flex;
     gap: 15px;
@@ -170,7 +157,6 @@ h1, h2, h3 {
     flex: 1;
     cursor: pointer;
     position: relative;
-    margin: 0;
 }
 
 .radio-tile-label input {
@@ -185,8 +171,8 @@ h1, h2, h3 {
     align-items: center;
     justify-content: center;
     width: 100%;
-    min-height: 50px;
-    padding: 15px 10px;
+    min-height: 55px;
+    padding: 15px;
     border: 2px solid #f1f2f6;
     border-radius: 12px;
     background-color: #ffffff;
@@ -194,8 +180,6 @@ h1, h2, h3 {
     font-size: 1.1rem;
     font-weight: 500;
     transition: all 0.2s ease-in-out;
-    box-sizing: border-box;
-    text-align: center;
 }
 
 .radio-tile-label:hover .radio-tile {
@@ -212,24 +196,12 @@ h1, h2, h3 {
     font-weight: bold;
 }
 
-@media (max-width: 480px) {
-    .radio-tile-group { flex-direction: column; gap: 10px; }
-}
-
 /* ==========================================================================
-   5. Grids, Stats & News
+   5. News, Stats & Food
    ========================================================================== */
-.grid-2-chart { 
-    display: grid; 
-    grid-template-columns: 1fr 1fr; 
-    gap: 20px; 
-}
+.grid-2-chart { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 768px) { .grid-2-chart { grid-template-columns: 1fr; } }
 
-@media (max-width: 768px) { 
-    .grid-2-chart { grid-template-columns: 1fr; } 
-}
-
-/* ส่วนบทความหน้าแรก */
 #daily-article-container {
     max-width: 900px;
     margin: 0 auto;
@@ -241,7 +213,6 @@ h1, h2, h3 {
     flex-wrap: wrap;
 }
 
-/* ส่วนสถิติ */
 .stats-section {
     margin-top: 40px;
     padding: 50px 20px;
@@ -249,54 +220,14 @@ h1, h2, h3 {
     border-top: 2px dashed #ffe0e6;
 }
 
-/* ==========================================================================
-   6. Food Page (ส่วนตกแต่งหน้าอาหาร)
-   ========================================================================== */
-.food-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
-}
-
-.food-card {
-    background: white;
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-    transition: transform 0.3s;
-    border: 1px solid rgba(255, 117, 140, 0.1);
-    display: flex;
-    flex-direction: column;
-}
-
-.food-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(255, 117, 140, 0.2);
-}
-
-.food-header {
-    background: #fff0f3;
-    padding: 20px;
-    text-align: center;
-    border-bottom: 1px solid #ffe3e8;
-}
-
-.food-icon {
-    font-size: 4rem;
-    display: block;
-    margin-bottom: 10px;
-    animation: float 3s ease-in-out infinite;
-}
-
-.food-body { padding: 25px; flex: 1; display: flex; flex-direction: column; }
-
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
+.stat-card-group { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-bottom: 30px; }
+.stat-card {
+    flex: 1; min-width: 200px; background: white; padding: 25px; 
+    border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.03); text-align: center;
 }
 
 /* ==========================================================================
-   7. Utilities
+   6. Utilities & Animations
    ========================================================================== */
 .hidden { display: none !important; }
 .fade-in { animation: fadeIn 0.8s; }
@@ -305,3 +236,8 @@ h1, h2, h3 {
     to { opacity: 1; transform: translateY(0); } 
 }
 
+@media (max-width: 600px) {
+    .logo { font-size: 1.45rem; }
+    .radio-tile-group { flex-direction: column; }
+    .btn-main { min-width: 100%; }
+}
