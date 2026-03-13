@@ -48,12 +48,19 @@ body {
 
 .logo {
     font-family: 'Mitr', sans-serif;
-    font-size: 1.5rem;
-    font-weight: bold;
+    font-size: 1.8rem;   /* 👈 เพิ่มเป็น 1.8 หรือ 2.0 ตามความชอบครับ */
+    font-weight: 700;    /* 👈 บังคับความหนาให้ชัดเจน */
     color: var(--primary);
     text-transform: uppercase;
+    letter-spacing: 1px; /* 👈 เพิ่มระยะห่างตัวอักษรนิดหน่อยให้ดูแพง */
 }
 
+/* แถม: ทำให้โลโก้หดขนาดลงนิดนึงเวลาดูในมือถือ จะได้ไม่ล้น */
+@media (max-width: 600px) {
+    .logo {
+        font-size: 1.4rem;
+    }
+}
 .nav-links {
     list-style: none;
     display: flex;
@@ -297,3 +304,4 @@ h1, h2, h3 {
     from { opacity: 0; transform: translateY(20px); } 
     to { opacity: 1; transform: translateY(0); } 
 }
+
