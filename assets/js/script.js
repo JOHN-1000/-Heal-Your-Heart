@@ -1,5 +1,5 @@
 // ==========================================
-// 🚨 นำลิงก์ Web App URL ตัวใหม่สุด มาวางในบรรทัดนี้ครับ 🚨
+// 🚨 ลิงก์ Web App URL ของคุณ (เชื่อมกับ Google Sheets แล้ว)
 // ==========================================
 const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyskl0lWrc-O_nXfpBNSjopLQLvc_A878JjIaPPPp02SH7CxhYIq6t5l3T6GBy7bCCX/exec"; 
 
@@ -9,6 +9,9 @@ window.onload = function() {
     if (document.getElementById('questions-2q') || document.getElementById('questions-9q')) renderQuestions();
     if (document.getElementById('result-content')) loadResult();
     if (document.getElementById('dailyChart')) renderStatsCharts(); 
+    
+    // 👇 บรรทัดนี้แหละครับที่สั่งให้บทความโผล่มา!
+    loadDailyArticle(); 
 };
 
 function showDailyQuote() {
@@ -173,7 +176,6 @@ function saveData(s9, s5, age, gender, job) {
     localStorage.setItem('healHeartHistory', JSON.stringify(history));
     localStorage.setItem('healHeartResult', JSON.stringify(newData));
 
-    // ✅ ลบแจ้งเตือน Alert ออกเรียบร้อย ส่งข้อมูลเข้าเงียบๆ อย่างโปร
     fetch(GOOGLE_SHEET_URL, {
         method: 'POST',
         mode: 'no-cors', 
@@ -277,7 +279,7 @@ function clearHistory() {
 }
 
 // ==========================================
-// 6. 📊 กราฟสถิติ (แก้ปัญหา Google Sheets แปลงวันที่ + อัปเกรดหน้าตา)
+// 6. 📊 กราฟสถิติ 
 // ==========================================
 async function renderStatsCharts() {
     try {
@@ -299,29 +301,24 @@ async function renderStatsCharts() {
 
         allData.forEach(row => {
             if(row[0]) {
-                // 🚨 ดักจับและแปลงวันที่ ที่ Google Sheets แอบเปลี่ยน
                 let d, m, y;
                 let dateString = String(row[0]);
                 
                 if (dateString.includes('T')) {
-                    // กรณี Google Sheets แปลงเป็นเวลาสากล
                     let dt = new Date(dateString);
                     d = dt.getDate();
                     m = dt.getMonth() + 1;
                     y = dt.getFullYear();
                 } else {
-                    // กรณีเป็นข้อความปกติที่เราส่งไป
                     let parts = dateString.split(' ')[0].split('/');
                     d = parseInt(parts[0]);
                     m = parseInt(parts[1]);
                     y = parseInt(parts[2]);
                 }
 
-                // สร้างวันที่แบบสวยงามสำหรับโชว์ในกราฟ (เช่น 13/3/2026)
                 const cleanDateStr = `${d}/${m}/${y}`;
                 visitDates[cleanDateStr] = (visitDates[cleanDateStr] || 0) + 1;
 
-                // ตรวจสอบว่าเป็น "วันนี้" หรือไม่
                 if (d === today.getDate() && m === (today.getMonth() + 1) && y === today.getFullYear()) {
                     dailyUsers++; 
                 }
@@ -353,7 +350,6 @@ async function renderStatsCharts() {
         const riskPercent = totalUsers > 0 ? Math.round((riskUsers / totalUsers) * 100) : 0;
         if (document.getElementById('risk-users')) document.getElementById('risk-users').innerText = riskPercent + "%";
 
-        // 📈 1. กราฟจำนวนผู้ใช้งาน
         new Chart(document.getElementById('dailyChart'), {
             type: 'line',
             data: { 
@@ -370,17 +366,9 @@ async function renderStatsCharts() {
                     pointRadius: 4
                 }] 
             },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { borderDash: [5, 5] } },
-                    x: { grid: { display: false } }
-                }
-            }
+            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { borderDash: [5, 5] } }, x: { grid: { display: false } } } }
         });
 
-        // 🍩 2. กราฟวงกลมอาชีพ
         new Chart(document.getElementById('jobChart'), {
             type: 'doughnut',
             data: { 
@@ -392,50 +380,30 @@ async function renderStatsCharts() {
                     hoverOffset: 5
                 }] 
             },
-            options: {
-                responsive: true,
-                cutout: '70%', 
-                plugins: { 
-                    legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true } } 
-                }
-            }
+            options: { responsive: true, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true } } } }
         });
 
-        // 📊 3. กราฟอายุ
         new Chart(document.getElementById('ageChart'), {
             type: 'bar',
             data: { 
                 labels: Object.keys(ageGroups), 
-                datasets: [{ 
-                    label: ' จำนวนคน', 
-                    data: Object.values(ageGroups), 
-                    backgroundColor: '#fdcb6e', 
-                    borderRadius: 8, 
-                    barPercentage: 0.6
-                }] 
+                datasets: [{ label: ' จำนวนคน', data: Object.values(ageGroups), backgroundColor: '#fdcb6e', borderRadius: 8, barPercentage: 0.6 }] 
             },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { borderDash: [5, 5] } },
-                    x: { grid: { display: false } }
-                }
-            }
+            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { borderDash: [5, 5] } }, x: { grid: { display: false } } } }
         });
 
     } catch (error) {
         console.error("เกิดข้อผิดพลาดในการโหลดสถิติจริง:", error);
     }
 }
+
 // ==========================================
 // 7. 📰 ระบบอัปเดตบทความฮีลใจประจำวันอัตโนมัติ
 // ==========================================
 function loadDailyArticle() {
     const container = document.getElementById('daily-article-container');
-    if (!container) return; // ถ้าไม่ใช่หน้าแรก ให้ข้ามไป
+    if (!container) return; 
 
-    // คลังบทความ (สามารถมาเพิ่มทีหลังได้เรื่อยๆ)
     const articles = [
         {
             title: "5 วิธีรับมือกับความเครียดจากการทำงาน (Burnout)",
@@ -459,12 +427,10 @@ function loadDailyArticle() {
         }
     ];
 
-    // คำนวณหาวันที่ในรอบปี เพื่อเลือกบทความสลับกันไปทุกวัน
     const now = new Date();
     const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
     const article = articles[dayOfYear % articles.length];
 
-    // วาดกล่องบทความพร้อมรูปภาพระดับพรีเมียม
     container.innerHTML = `
         <div style="flex: 1; min-width: 300px;">
             <img src="${article.image}" alt="Article Image" style="width: 100%; height: 100%; object-fit: cover; min-height: 280px;">
