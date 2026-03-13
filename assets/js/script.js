@@ -398,7 +398,7 @@ async function renderStatsCharts() {
 }
 
 // ==========================================
-// 7. 📰 ระบบอัปเดตบทความฮีลใจประจำวันอัตโนมัติ
+// 7. 📰 ระบบอัปเดตบทความฮีลใจประจำวันอัตโนมัติ (แก้ไขลิงก์แล้ว)
 // ==========================================
 function loadDailyArticle() {
     const container = document.getElementById('daily-article-container');
@@ -408,22 +408,14 @@ function loadDailyArticle() {
         {
             title: "5 วิธีรับมือกับความเครียดจากการทำงาน (Burnout)",
             excerpt: "ความเครียดเป็นเรื่องธรรมชาติ แต่เราสามารถจัดการได้ด้วยการพักเบรกสั้นๆ การจัดลำดับความสำคัญ และการฝึกหายใจ...",
-            image: "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?auto=format&fit=crop&w=800&q=80"
+            image: "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?auto=format&fit=crop&w=800&q=80",
+            link: "article-burnout.html" // เพิ่มลิงก์จริงเข้าไปตรงนี้
         },
         {
             title: "ทำไมการนอนหลับถึงสำคัญต่อสุขภาพจิต?",
             excerpt: "การอดนอนไม่เพียงส่งผลต่อร่างกาย แต่ยังทำให้อารมณ์แปรปรวนและเสี่ยงต่อภาวะซึมเศร้า มาดูวิธีปรับพฤติกรรมการนอนกัน...",
-            image: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80"
-        },
-        {
-            title: "Digital Detox: พักหน้าจอ เพื่อพักใจ",
-            excerpt: "ในยุคที่ข้อมูลท่วมท้น การลองปิดมือถือและโซเชียลมีเดียสักวันหยุดสุดสัปดาห์ จะช่วยลดความวิตกกังวลได้อย่างน่าเหลือเชื่อ...",
-            image: "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=800&q=80"
-        },
-        {
-            title: "พลังแห่งการเขียนบันทึก (Journaling)",
-            excerpt: "การเขียนระบายความรู้สึกระบายลงในกระดาษ เป็นหนึ่งในวิธีบำบัดจิตใจที่แพทย์แนะนำ เพราะช่วยให้เราจัดระเบียบความคิดได้ดีขึ้น...",
-            image: "https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&w=800&q=80"
+            image: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80",
+            link: "#"
         }
     ];
 
@@ -439,19 +431,9 @@ function loadDailyArticle() {
             <span style="display: inline-block; padding: 6px 15px; background: #ffe0e6; color: #ff758c; border-radius: 20px; font-size: 0.85rem; font-weight: bold; margin-bottom: 15px; width: fit-content;">✨ บทความแนะนำวันนี้</span>
             <h3 style="color: #2d3436; margin-bottom: 15px; font-size: 1.5rem; line-height: 1.4;">${article.title}</h3>
             <p style="color: #636e72; line-height: 1.6; margin-bottom: 25px;">${article.excerpt}</p>
-            <button class="btn-main" style="padding: 10px 25px; border-radius: 25px; font-size: 1rem; width: fit-content; border: none; cursor: pointer;" onclick="alert('ระบบอ่านบทความฉบับเต็ม กำลังอยู่ในช่วงพัฒนาครับ 💖')">อ่านเพิ่มเติม ➔</button>
+            
+            <button class="btn-main" style="padding: 10px 25px; border-radius: 25px; font-size: 1rem; width: fit-content; border: none; cursor: pointer;" 
+                onclick="window.location.href='${article.link}'">อ่านเพิ่มเติม ➔</button>
         </div>
     `;
 }
-// ฟังก์ชันสำหรับเปิด-ปิดเมนูในมือถือ
-function toggleMobileMenu() {
-    const navLinks = document.querySelector('.nav-links');
-    navLinks.classList.toggle('active');
-}
-
-// เพิ่มการปิดเมนูอัตโนมัติเมื่อกดลิงก์ (เผื่อหน้าเดิม)
-document.querySelectorAll('.nav-links a').forEach(link => {
-    link.addEventListener('click', () => {
-        document.querySelector('.nav-links').classList.remove('active');
-    });
-});
