@@ -297,4 +297,88 @@ h1, h2, h3 {
 @keyframes fadeIn { 
     from { opacity: 0; transform: translateY(20px); } 
     to { opacity: 1; transform: translateY(0); } 
+
+}
+/* ========================================= */
+/* 🎨 อัปเกรดปุ่มทำแบบประเมินให้กดง่ายและสวยงาม */
+/* ========================================= */
+
+/* จัดกลุ่มปุ่มให้เรียงสวยงามและเต็มบรรทัด */
+.radio-tile-group {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* ขยายพื้นที่กดให้เต็มกล่อง และเปลี่ยนเมาส์เป็นรูปมือ */
+.radio-tile-label {
+    flex: 1;
+    cursor: pointer;
+    position: relative;
+    margin: 0;
+}
+
+/* ซ่อนปุ่มวงกลม (Radio) ของเดิมทิ้งไป (แต่ระบบยังจำค่าได้อยู่) */
+.radio-tile-label input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    width: 0;
+    height: 0;
+}
+
+/* ตกแต่งกล่องปุ่มให้กดง่าย ดูพรีเมียม */
+.radio-tile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 50px; /* เพิ่มความสูงให้กดง่ายขึ้น */
+    padding: 15px 10px;
+    border: 2px solid #f1f2f6; /* สีขอบเริ่มต้น */
+    border-radius: 12px; /* มุมโค้งมน */
+    background-color: #ffffff;
+    color: #636e72;
+    font-size: 1.1rem;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+/* เอฟเฟกต์ตอนเอาเมาส์ชี้ (Hover) - กล่องจะสว่างขึ้น */
+.radio-tile-label:hover .radio-tile {
+    border-color: #ffb8c6;
+    background-color: #fff9fa;
+}
+
+/* ✨ เอฟเฟกต์ตอนถูกคลิกเลือก (Checked) - เปลี่ยนสีและเด้งขึ้น */
+.radio-tile-label input[type="radio"]:checked + .radio-tile {
+    background-color: #ff758c;
+    border-color: #ff758c;
+    color: white;
+    box-shadow: 0 8px 20px rgba(255, 117, 140, 0.3);
+    transform: translateY(-3px); /* ทำให้ปุ่มเด้งลอยขึ้นมานิดนึง */
+}
+
+/* ปรับปุ่มให้เรียงเป็นแนวตั้งถ้าย่อดูในมือถือเครื่องเล็กๆ */
+@media (max-width: 480px) {
+    .radio-tile-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+/* ========================================= */
+/* 🎯 จัดปุ่ม "ดำเนินการต่อ" ให้อยู่กึ่งกลางเสมอ */
+/* ========================================= */
+
+.btn-main {
+    display: block !important;       /* บังคับให้ปุ่มแยกเป็นบรรทัดของตัวเอง */
+    margin-left: auto !important;    /* ดันจากซ้ายอัตโนมัติ */
+    margin-right: auto !important;   /* ดันจากขวาอัตโนมัติ (ผลลัพธ์คืออยู่ตรงกลางเป๊ะ!) */
+    text-align: center;              /* จัดข้อความในปุ่มให้อยู่ตรงกลาง */
+    min-width: 250px;                /* กำหนดความกว้างขั้นต่ำให้ปุ่มดูอวบอิ่ม สมดุล */
+    max-width: 100%;                 /* ป้องกันปุ่มล้นจอมือถือ */
+    box-sizing: border-box;
 }
