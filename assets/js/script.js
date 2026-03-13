@@ -159,7 +159,7 @@ function submitAll() {
 }
 
 // ==========================================
-// 4. บันทึกและส่งข้อมูลไป Google Sheets (ขั้นเด็ดขาด)
+// 4. บันทึกและส่งข้อมูลไป Google Sheets
 // ==========================================
 function saveData(s9, s5, age, gender, job) {
     document.body.style.cursor = "wait";
@@ -173,10 +173,7 @@ function saveData(s9, s5, age, gender, job) {
     localStorage.setItem('healHeartHistory', JSON.stringify(history));
     localStorage.setItem('healHeartResult', JSON.stringify(newData));
 
-    // 🚨 เด้งแจ้งเตือนบนหน้าจอ เพื่อเช็คว่ามันใช้ลิงก์ใหม่หรือยัง!
-    alert("ระบบกำลังส่งข้อมูลไปที่ลิงก์นี้:\n\n" + GOOGLE_SHEET_URL + "\n\n(เช็คดูว่าตรงกับลิงก์ล่าสุดใน Apps Script ไหม)");
-
-    // ส่งข้อมูลแบบบังคับทะลุบล็อก (no-cors)
+    // ✅ ลบแจ้งเตือน Alert ออกเรียบร้อย ส่งข้อมูลเข้าเงียบๆ อย่างโปร
     fetch(GOOGLE_SHEET_URL, {
         method: 'POST',
         mode: 'no-cors', 
@@ -188,11 +185,12 @@ function saveData(s9, s5, age, gender, job) {
         window.location.href = 'result.html'; 
     })
     .catch(error => {
-        alert("ส่งข้อมูลไม่สำเร็จ: " + error.message);
+        console.error("ส่งข้อมูลมีปัญหา: ", error.message);
         document.body.style.cursor = "default";
         window.location.href = 'result.html'; 
     });
 }
+
 // ==========================================
 // 5. แสดงผลลัพธ์หน้า result.html
 // ==========================================
@@ -256,9 +254,6 @@ function loadResult() {
     }
 }
 
-// ==========================================
-// 💡 ฟังก์ชันปุ่มโหลดรูป (ที่เคยหายไป กลับมาแล้ว!)
-// ==========================================
 function downloadResultImage() {
     const captureArea = document.getElementById('capture-area') || document.getElementById('result-content');
     if (typeof html2canvas !== 'undefined') {
@@ -282,10 +277,14 @@ function clearHistory() {
 }
 
 // ==========================================
-// 6. ดึงข้อมูลจริงจาก Google Sheets มาสร้างกราฟ (แก้ไขสีและชื่ออาชีพ)
+// 6. 📊 กราฟสถิติ (อัปเกรดหน้าตาให้พรีเมียมมืออาชีพ)
 // ==========================================
 async function renderStatsCharts() {
     try {
+        // ตั้งค่าให้ฟอนต์กราฟเป็น Sarabun ตรงกับหน้าเว็บ
+        Chart.defaults.font.family = "'Sarabun', sans-serif";
+        Chart.defaults.color = "#636e72";
+
         const response = await fetch(GOOGLE_SHEET_URL);
         const allData = await response.json(); 
 
@@ -321,7 +320,6 @@ async function renderStatsCharts() {
             }
 
             let job = row[3];
-            // เผื่อเจอคำว่า student ที่หลงเหลืออยู่ ให้แปลงเป็น นักเรียน/นศ.
             if(job === "student" || job === "นักเรียน/นักศึกษา") job = "นักเรียน/นศ."; 
 
             if (jobCounts.hasOwnProperty(job)) jobCounts[job]++;
@@ -334,37 +332,78 @@ async function renderStatsCharts() {
         const riskPercent = totalUsers > 0 ? Math.round((riskUsers / totalUsers) * 100) : 0;
         if (document.getElementById('risk-users')) document.getElementById('risk-users').innerText = riskPercent + "%";
 
-        // กราฟจำนวนผู้ใช้งาน
+        // 📈 1. กราฟจำนวนผู้ใช้งาน (ซ่อนเส้นตารางรกๆ ทำให้ดูคลีน)
         new Chart(document.getElementById('dailyChart'), {
             type: 'line',
-            data: { labels: Object.keys(visitDates), datasets: [{ label: 'ผู้ใช้งานจริง (คน)', data: Object.values(visitDates), borderColor: '#ff758c', backgroundColor: 'rgba(255, 117, 140, 0.2)', fill: true, tension: 0.4 }] }
+            data: { 
+                labels: Object.keys(visitDates), 
+                datasets: [{ 
+                    label: ' ผู้ใช้งาน (คน)', 
+                    data: Object.values(visitDates), 
+                    borderColor: '#ff758c', 
+                    backgroundColor: 'rgba(255, 117, 140, 0.15)', 
+                    fill: true, 
+                    tension: 0.4, // ทำให้เส้นโค้งสวยงาม
+                    pointBackgroundColor: '#ff758c',
+                    pointBorderWidth: 2,
+                    pointRadius: 4
+                }] 
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { borderDash: [5, 5] } },
+                    x: { grid: { display: false } } // ปิดเส้นแนวตั้ง
+                }
+            }
         });
 
-        // 🎨 กราฟวงกลมอาชีพ (ล็อกสีให้ตรงกับ Label เสมอ)
+        // 🍩 2. กราฟวงกลมอาชีพ (ปรับให้ทันสมัย มีมิติ)
         new Chart(document.getElementById('jobChart'), {
             type: 'doughnut',
             data: { 
                 labels: Object.keys(jobCounts), 
                 datasets: [{ 
                     data: Object.values(jobCounts), 
-                    // เรียงสีตามนี้: นักเรียน(แดงชมพู), ข้าราชการ(ม่วง), พนักงานบริษัท(ฟ้า), ธุรกิจ(เหลือง), ฟรีแลนซ์(ส้ม)
-                    backgroundColor: ['#ff758c', '#a29bfe', '#74b9ff', '#ffeaa7', '#fab1a0'] 
+                    backgroundColor: ['#ff758c', '#a29bfe', '#74b9ff', '#ffeaa7', '#fab1a0'],
+                    borderWidth: 2,
+                    hoverOffset: 5
                 }] 
+            },
+            options: {
+                responsive: true,
+                cutout: '70%', // เจาะรูตรงกลางให้ใหญ่ขึ้น ดูคลีน
+                plugins: { 
+                    legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true } } 
+                }
             }
         });
 
-        // กราฟอายุ
+        // 📊 3. กราฟอายุ (โค้งมนน่ารัก)
         new Chart(document.getElementById('ageChart'), {
             type: 'bar',
-            data: { labels: Object.keys(ageGroups), datasets: [{ label: 'จำนวนคน', data: Object.values(ageGroups), backgroundColor: '#fdcb6e', borderRadius: 5 }] }
+            data: { 
+                labels: Object.keys(ageGroups), 
+                datasets: [{ 
+                    label: ' จำนวนคน', 
+                    data: Object.values(ageGroups), 
+                    backgroundColor: '#fdcb6e', 
+                    borderRadius: 8, // ปรับให้มุมแท่งกราฟโค้งมน
+                    barPercentage: 0.6
+                }] 
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { borderDash: [5, 5] } },
+                    x: { grid: { display: false } }
+                }
+            }
         });
 
     } catch (error) {
         console.error("เกิดข้อผิดพลาดในการโหลดสถิติจริง:", error);
     }
 }
-
-
-
-
-
