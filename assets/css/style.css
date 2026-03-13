@@ -1,5 +1,5 @@
 /* ==========================================================================
-   1. ตั้งค่าพื้นฐาน (Variables & Reset)
+   Heal Your Heart - ฉบับปรับปรุงใหม่ (แก้โลโก้มือถือซ้อน)
    ========================================================================== */
 :root {
     --primary: #ff758c;
@@ -12,288 +12,93 @@
     --radius: 20px;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Sarabun', sans-serif;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Sarabun', sans-serif; }
 
 body {
     background-color: var(--bg-color);
     background-image: radial-gradient(at top left, #fff5f7, transparent);
     color: var(--text-main);
-    line-height: 1.6;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    line-height: 1.6; min-height: 100vh;
+    display: flex; flex-direction: column;
 }
 
-/* ==========================================================================
-   2. เมนูบาร์ (Navbar)
-   ========================================================================== */
+/* Navbar & Logo */
 .navbar {
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     padding: 1rem 5%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    display: flex; justify-content: space-between; align-items: center;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+    position: sticky; top: 0; z-index: 1000;
 }
 
 .logo {
     font-family: 'Mitr', sans-serif;
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #ff758c;
-    text-transform: uppercase;
+    font-size: 1.85rem; font-weight: 700;
+    color: var(--primary); text-transform: uppercase;
+    white-space: nowrap;
 }
 
-.nav-links {
-    list-style: none;
-    display: flex;
-    gap: 25px;
-}
+.logo a { text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px; }
 
-.nav-links a {
-    text-decoration: none;
-    color: var(--text-main);
-    font-weight: 500;
-    transition: 0.3s;
-}
+.nav-links { list-style: none; display: flex; gap: 25px; }
+.nav-links a { text-decoration: none; color: var(--text-main); font-weight: 500; transition: 0.3s; }
+.nav-links a:hover, .nav-links a.active { color: var(--primary); border-bottom: 2px solid var(--primary); }
 
-.nav-links a:hover, .nav-links a.active {
-    color: #ff758c;
-    border-bottom: 2px solid #ff758c;
-}
+.hamburger { display: none; font-size: 1.8rem; cursor: pointer; color: var(--primary); }
 
-.hamburger {
-    display: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: var(--text-main);
-}
-
+/* --- ส่วนที่ทำให้ในมือถือดูสวยเหมือนรูปที่ 2 --- */
 @media (max-width: 900px) {
+    .hamburger { display: block; }
     .nav-links {
-        display: none;
-        position: absolute;
-        top: 70px;
-        left: 0;
-        width: 100%;
-        background: white;
-        flex-direction: column;
-        padding: 20px;
-        box-shadow: var(--shadow);
-        text-align: center;
+        display: none; position: absolute; top: 100%; left: 0; width: 100%;
+        background: white; flex-direction: column;
+        padding: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        text-align: center; gap: 15px;
     }
     .nav-links.active { display: flex; }
-    .hamburger { display: block; }
 }
 
-/* ==========================================================================
-   3. โครงสร้างและกล่องเนื้อหา (Layout & Cards)
-   ========================================================================== */
-.container {
-    max-width: 1000px;
-    margin: 40px auto;
-    padding: 0 20px;
-    flex: 1;
+@media (max-width: 600px) {
+    .navbar { padding: 0.8rem 4% !important; }
+    /* บังคับโลโก้แถวเดียวในมือถือ */
+    .logo { font-size: 1.35rem !important; letter-spacing: -0.2px; }
+    .logo a { gap: 6px; }
+    .btn-main { min-width: 100% !important; max-width: 100%; }
+    .radio-tile-group { flex-direction: column; }
 }
 
-.card {
-    background: var(--card-bg);
-    padding: 40px;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    margin-bottom: 30px;
-    text-align: left;
-    transition: transform 0.3s;
-}
+/* UI Elements */
+.container { max-width: 1000px; margin: 40px auto; padding: 0 20px; flex: 1; }
+.card { background: var(--card-bg); padding: 40px; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 30px; }
 
-.card:hover { transform: translateY(-5px); }
-.text-center { text-align: center; }
-
-h1, h2, h3 {
-    font-family: 'Mitr', sans-serif;
-    color: #2d3436;
-    margin-bottom: 15px;
-}
-
-/* ==========================================================================
-   4. ปุ่มและฟอร์ม (UI Elements)
-   ========================================================================== */
 .btn-main {
-    display: inline-block;
-    background: var(--primary-gradient);
-    color: white;
-    padding: 12px 35px;
-    border-radius: 50px;
-    text-decoration: none;
-    border: none;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: 0 5px 15px rgba(255, 117, 140, 0.4);
-    transition: 0.3s;
+    display: block !important; margin: 0 auto 18px;
+    background: var(--primary-gradient); color: white;
+    padding: 14px 35px; border-radius: 50px; text-decoration: none;
+    font-weight: 600; cursor: pointer; text-align: center;
+    min-width: 260px; max-width: 320px; border: none; transition: 0.3s;
 }
-
-.btn-main:hover { transform: scale(1.05); }
-
-.form-group { margin-bottom: 20px; text-align: left; }
-.form-label { font-weight: bold; margin-bottom: 8px; display: block; }
-.form-control {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid #eee;
-    border-radius: 10px;
-    outline: none;
-    font-size: 1rem;
-}
-.form-control:focus { border-color: #ff758c; }
 
 /* Radio Tiles */
-.radio-tile-group { display: flex; gap: 10px; flex-wrap: wrap; }
+.radio-tile-group { display: flex; gap: 15px; width: 100%; margin-top: 10px; }
 .radio-tile-label { flex: 1; cursor: pointer; position: relative; }
-.radio-tile-label input { display: none; }
+.radio-tile-label input { position: absolute; opacity: 0; width: 0; height: 0; }
 .radio-tile {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 10px;
-    border: 2px solid #eee;
-    border-radius: 10px;
-    color: #888;
-    transition: 0.2s;
-    background: white;
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; min-height: 55px; padding: 15px;
+    border: 2px solid #f1f2f6; border-radius: 12px;
+    background-color: #ffffff; color: var(--text-muted);
+    font-size: 1.1rem; font-weight: 500; transition: 0.2s;
 }
 .radio-tile-label input:checked + .radio-tile {
-    background: #fff0f3;
-    border-color: #ff758c;
-    color: #ff758c;
-    font-weight: bold;
+    background-color: var(--primary); border-color: var(--primary); color: white; transform: translateY(-3px);
 }
 
-/* ==========================================================================
-   5. ตาราง, โซเชียล และ กราฟ (Grids & Social)
-   ========================================================================== */
-.grid-3 {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-}
-
-.grid-2-chart { 
-    display: grid; 
-    grid-template-columns: 1fr 1fr; 
-    gap: 20px; 
-}
-
-@media (max-width: 768px) { 
-    .grid-2-chart { grid-template-columns: 1fr; } 
-    .card[style*="grid-column: span 2"] { grid-column: span 1 !important; }
-}
-
-.social-btn {
-    display: block;
-    padding: 15px;
-    margin: 10px 0;
-    border-radius: 10px;
-    text-decoration: none;
-    color: white;
-    font-weight: bold;
-    text-align: center;
-    transition: 0.3s;
-}
-.social-fb { background-color: #1877F2; }
-.social-line { background-color: #06C755; }
-.social-tiktok { background-color: #000000; }
-.social-btn:hover { opacity: 0.9; transform: translateY(-2px); }
-
-/* ==========================================================================
-   6. ส่วนตกแต่งหน้าอาหาร (Food Page) ✅ เอาหลับมาให้แล้ว!
-   ========================================================================== */
-.food-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
-}
-
-.food-card {
-    background: white;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-    transition: transform 0.3s;
-    border: 1px solid rgba(255, 117, 140, 0.1);
-    display: flex;
-    flex-direction: column;
-}
-
-.food-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(255, 117, 140, 0.2);
-}
-
-.food-header {
-    background: #fff0f3;
-    padding: 20px;
-    text-align: center;
-    border-bottom: 1px solid #ffe3e8;
-}
-
-.food-icon {
-    font-size: 4rem;
-    display: block;
-    margin-bottom: 10px;
-    animation: float 3s ease-in-out infinite;
-}
-
-.food-body {
-    padding: 25px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.food-benefit {
-    color: #636e72;
-    margin-bottom: 20px;
-    font-size: 0.95rem;
-    line-height: 1.6;
-}
-
-.food-tip-box {
-    background: #fdfdfd;
-    border-left: 4px solid #ff758c;
-    padding: 15px;
-    border-radius: 5px;
-    margin-top: auto;
-    font-size: 0.9rem;
-}
-
-.tip-label {
-    color: #ff758c;
-    font-weight: bold;
-    display: block;
-    margin-bottom: 5px;
-}
-
-@keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-    100% { transform: translateY(0px); }
-}
-
-/* ==========================================================================
-   7. ยูทิลิตี้ (Utilities)
-   ========================================================================== */
+/* Utilities */
 .hidden { display: none !important; }
-.fade-in { animation: fadeIn 0.8s; }
+.text-center { text-align: center; }
+.fade-in { animation: fadeIn 0.8s ease-out forwards; }
 @keyframes fadeIn { 
     from { opacity: 0; transform: translateY(20px); } 
     to { opacity: 1; transform: translateY(0); } 
