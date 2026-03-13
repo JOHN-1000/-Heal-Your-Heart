@@ -282,7 +282,7 @@ function clearHistory() {
 }
 
 // ==========================================
-// 6. ดึงข้อมูลจริงจาก Google Sheets มาสร้างกราฟ
+// 6. ดึงข้อมูลจริงจาก Google Sheets มาสร้างกราฟ (แก้ไขสีและชื่ออาชีพ)
 // ==========================================
 async function renderStatsCharts() {
     try {
@@ -320,7 +320,10 @@ async function renderStatsCharts() {
                 else ageGroups["50+"]++;
             }
 
-            const job = row[3];
+            let job = row[3];
+            // เผื่อเจอคำว่า student ที่หลงเหลืออยู่ ให้แปลงเป็น นักเรียน/นศ.
+            if(job === "student" || job === "นักเรียน/นักศึกษา") job = "นักเรียน/นศ."; 
+
             if (jobCounts.hasOwnProperty(job)) jobCounts[job]++;
             else if (job) jobCounts["ฟรีแลนซ์/อื่นๆ"]++;
         });
@@ -331,16 +334,26 @@ async function renderStatsCharts() {
         const riskPercent = totalUsers > 0 ? Math.round((riskUsers / totalUsers) * 100) : 0;
         if (document.getElementById('risk-users')) document.getElementById('risk-users').innerText = riskPercent + "%";
 
+        // กราฟจำนวนผู้ใช้งาน
         new Chart(document.getElementById('dailyChart'), {
             type: 'line',
             data: { labels: Object.keys(visitDates), datasets: [{ label: 'ผู้ใช้งานจริง (คน)', data: Object.values(visitDates), borderColor: '#ff758c', backgroundColor: 'rgba(255, 117, 140, 0.2)', fill: true, tension: 0.4 }] }
         });
 
+        // 🎨 กราฟวงกลมอาชีพ (ล็อกสีให้ตรงกับ Label เสมอ)
         new Chart(document.getElementById('jobChart'), {
             type: 'doughnut',
-            data: { labels: Object.keys(jobCounts), datasets: [{ data: Object.values(jobCounts), backgroundColor: ['#ff758c', '#a29bfe', '#74b9ff', '#ffeaa7', '#fab1a0'] }] }
+            data: { 
+                labels: Object.keys(jobCounts), 
+                datasets: [{ 
+                    data: Object.values(jobCounts), 
+                    // เรียงสีตามนี้: นักเรียน(แดงชมพู), ข้าราชการ(ม่วง), พนักงานบริษัท(ฟ้า), ธุรกิจ(เหลือง), ฟรีแลนซ์(ส้ม)
+                    backgroundColor: ['#ff758c', '#a29bfe', '#74b9ff', '#ffeaa7', '#fab1a0'] 
+                }] 
+            }
         });
 
+        // กราฟอายุ
         new Chart(document.getElementById('ageChart'), {
             type: 'bar',
             data: { labels: Object.keys(ageGroups), datasets: [{ label: 'จำนวนคน', data: Object.values(ageGroups), backgroundColor: '#fdcb6e', borderRadius: 5 }] }
@@ -350,8 +363,6 @@ async function renderStatsCharts() {
         console.error("เกิดข้อผิดพลาดในการโหลดสถิติจริง:", error);
     }
 }
-
-
 
 
 
