@@ -169,36 +169,73 @@ body {
     to { opacity: 1; transform: translateY(0); } 
 }
 /* ==========================================================================
-   บทความประจำวัน (Daily Article Card)
+   บทความประจำวัน (Daily Article Card) - แก้ไขการจัดวาง
    ========================================================================== */
 #daily-article-container {
-    max-width: 900px; margin: 0 auto; background: #fff;
-    border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.06);
-    overflow: hidden; display: flex; flex-wrap: wrap;
+    max-width: 950px; 
+    margin: 0 auto; 
+    background: #fff;
+    border-radius: 20px; 
+    box-shadow: 0 10px 30px rgba(255, 117, 140, 0.15);
+    overflow: hidden; 
+    display: flex; /* บังคับให้อยู่ข้างกัน */
+    align-items: stretch; /* ให้ความสูง 2 ฝั่งเท่ากัน */
 }
+
 .article-img {
-    flex: 1; min-width: 300px;
+    flex: 1; 
+    width: 50%; /* บังคับรูปกว้าง 50% บนจอคอม */
 }
+
 .article-img img {
-    width: 100%; height: 100%; object-fit: cover; min-height: 280px;
+    width: 100%; 
+    height: 100%; 
+    min-height: 350px; /* ให้รูปมีความสูงพอดี ไม่โดนตัดสั้นเกินไป */
+    object-fit: cover; /* ให้รูปเต็มกรอบโดยไม่เสียสัดส่วน */
+    display: block;
 }
+
 .article-content {
-    flex: 1.2; padding: 40px; min-width: 300px;
-    display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+    flex: 1; 
+    width: 50%;
+    padding: 50px 40px; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; /* ดันข้อความให้อยู่ตรงกลางแนวตั้ง */
+    align-items: flex-start; /* จัดข้อความชิดซ้าย */
 }
+
 .article-tag {
     background-color: #ffe0e6; color: #ff758c;
     padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;
     margin-bottom: 15px; display: inline-block;
 }
+
 .article-title {
-    font-size: 1.5rem; color: #2d3436; margin-bottom: 15px; line-height: 1.4;
+    font-size: 1.6rem; color: #2d3436; margin-bottom: 15px; line-height: 1.4;
 }
+
 .article-desc {
     color: #636e72; margin-bottom: 25px; line-height: 1.6;
 }
 
-/* ปรับให้ขอบรูปมนรับกับกล่องในมือถือ */
+/* สำหรับหน้าจอมือถือ (ให้รูปอยู่บน ข้อความอยู่ล่าง) */
 @media (max-width: 768px) {
-    .article-content { padding: 30px; align-items: center; text-align: center; }
+    #daily-article-container {
+        flex-direction: column; /* สั่งให้เรียงแนวตั้งบนมือถือ */
+    }
+    .article-img, .article-content {
+        width: 100%; /* กว้างเต็มจอ */
+    }
+    .article-img img {
+        min-height: 250px; /* ลดความสูงรูปลงนิดนึงในมือถือ */
+    }
+    .article-content { 
+        padding: 30px 20px; 
+        align-items: center; /* จัดตัวหนังสือและปุ่มให้อยู่กึ่งกลาง */
+        text-align: center; 
+    }
+    .article-content .btn-main {
+        margin: 0 auto !important; /* บังคับปุ่มอยู่ตรงกลาง */
+    }
 }
